@@ -2,12 +2,15 @@ namespace MessageSense;
 
 public partial class SetupPage : ContentPage
 {
-	public SetupPage()
+	private AppManager _appManager;
+
+	public SetupPage(AppManager appManager)
 	{
 		InitializeComponent();
+		_appManager = appManager;
 	}
 
-	private void GetInputedData()
+	private void GetInputedData(object sender, EventArgs e)
     {
 		var username = userNameEntry.Text;
 		var firstName = firstNameEntry.Text;
@@ -17,5 +20,6 @@ public partial class SetupPage : ContentPage
 		Microsoft.Maui.Essentials.Preferences.Set("firstName", firstName);
 		Microsoft.Maui.Essentials.Preferences.Set("lastName", lastName);
 
+		Application.Current.MainPage = new MainPage(_appManager);
 	}
 }

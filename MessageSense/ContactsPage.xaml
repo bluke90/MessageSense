@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MessageSense.ContactsPage"
+             Title="ContactsPage"
+             BackgroundColor="#242424">
+
+    <Grid ColumnSpacing="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+
+        <Grid Grid.Row="0"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Label Text="Select a contact:"
+                Grid.Row="0"
+                Grid.Column="1"
+                FontSize="Medium"
+                FontAttributes="Bold"
+                WidthRequest="150"
+                Margin="20 0 10 0"/>
+
+            <Button
+                Text="Add Contact"
+                TextColor="White"
+                FontSize="Micro"
+                BackgroundColor="Black"
+                CornerRadius="5"
+                BorderColor="DarkGoldenrod"
+                BorderWidth="2"
+                Clicked="AddContact"
+                Grid.Row="0"
+                Grid.Column="0"
+                WidthRequest="100"
+                HeightRequest="40"
+                Margin="20 20 20 10"/>
+        </Grid>
+
+
+        <Frame
+            BackgroundColor="Black"
+            CornerRadius="5"
+            BorderColor="MediumBlue"
+            Grid.Column="0"
+            Grid.Row="1">
+
+            <VerticalStackLayout
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="FillAndExpand"
+                x:Name="contactStack"
+                Spacing="10"/>
+        </Frame>
+
+    </Grid>
+
+</ContentPage>

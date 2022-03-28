@@ -4,11 +4,12 @@
              x:Class="MessageSense.SetupPage"
              Title="SetupPage"
              BackgroundColor="White">
-    <StackLayout>
+    <StackLayout Spacing="10">
         <Label Text="Welcome to MessageSense!"
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" 
-               FontSize="Header"/>
+               FontSize="Medium"/>
+        
         <Label Text="Let's get started by setting up your profile"
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" />
@@ -18,21 +19,24 @@
                HorizontalOptions="Center"/>
         <Entry x:Name="userNameEntry"
                VerticalOptions="Center"
-               HorizontalOptions="Center"/>
+               HorizontalOptions="Center"
+               WidthRequest="150"/>
         
         <Label Text="First Name"
                VerticalOptions="Center"
                HorizontalOptions="Center"/>
         <Entry x:Name="firstNameEntry"
                VerticalOptions="Center"
-               HorizontalOptions="Center"/>
+               HorizontalOptions="Center"
+               WidthRequest="150"/>
         
         <Label Text="Last Name"
                VerticalOptions="Center"
                HorizontalOptions="Center"/>
         <Entry x:Name="lastNameEntry"
                VerticalOptions="Center"
-               HorizontalOptions="Center"/>
+               HorizontalOptions="Center"
+               WidthRequest="150"/>
 
         <Button Text="Complete Setup"
                 Clicked="GetInputedData"
