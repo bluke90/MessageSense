@@ -69,7 +69,7 @@
                     Placeholder="Message..."
                     VerticalOptions="FillAndExpand"
                     HorizontalOptions="StartAndExpand"
-                    WidthRequest="300"
+                    WidthRequest="275"
                     HeightRequest="250"
                     TextColor="White"
                     PlaceholderColor="White"
@@ -86,7 +86,7 @@
                     BorderWidth="2"
                     VerticalOptions="CenterAndExpand"
                     HorizontalOptions="EndAndExpand"
-                    WidthRequest="70"
+                    WidthRequest="65"
                     HeightRequest="45"
                     FontAttributes="Bold"
                     Margin="-5"/>
