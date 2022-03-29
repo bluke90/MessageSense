@@ -10,12 +10,20 @@ public partial class ContactsPage : ContentPage
 	{
 		InitializeComponent();
 		_appManager = appManager;
+		PopulateContacts();
+
+		string myToken = Microsoft.Maui.Essentials.Preferences.Get("token", "");
+		contactToken.Text = $"Contact Token: \n  {myToken.ToString()}";
+
 	}
 
 	private List<Models.Contact> _contacts;
 
+	private DateTime _pressed;
+
 	private async void PopulateContacts()
     {
+		contactStack.Clear();
 		_contacts = await _appManager.MessageSenseData.Contacts.ToListAsync();
 		if (_contacts != null && _contacts.Count > 0) {
 			foreach (var contact in _contacts)	{
@@ -31,23 +39,52 @@ public partial class ContactsPage : ContentPage
 		Button button = new Button()
 		{
 			Text = contact.Name,
-			TextColor = Colors.SeaShell,
+			FontAttributes = FontAttributes.Bold,
+			FontSize = 20,
+			TextColor = Colors.Black,
 			BindingContext = contact.Id.ToString(),
-			BackgroundColor = Color.FromArgb("#080808"),
-			BorderColor = Colors.MidnightBlue,
-			BorderWidth = 1,
+			BackgroundColor = Colors.DarkGoldenrod,
+			//BorderColor = Color.FromArgb("#1d66db"),
+			Margin = new Thickness(1),
+			Padding = new Thickness(15),
 			VerticalOptions = LayoutOptions.FillAndExpand,
-			HorizontalOptions = LayoutOptions.FillAndExpand
+			HorizontalOptions = LayoutOptions.FillAndExpand,
 		};
-		button.Clicked += ContactButtonClicked;
+		// button.Clicked += ContactButtonClicked;
+		button.Pressed += ContactButtonPressed;
+		button.Released += ContactButtonReleasedAsync;
 		return button;
 	}
+	private void ContactButtonPressed(object sender, EventArgs e)
+    {
+		_pressed = DateTime.Now;
+    }
+	private async void ContactButtonReleasedAsync(object sender, EventArgs e)
+    {
+		var contactId = ((Button)sender).BindingContext as string;
+		var cid = Convert.ToInt32(contactId);
+		var contact = await _appManager.MessageSenseData.Contacts.FirstOrDefaultAsync(m => m.Id == cid);
 
-	private void ContactButtonClicked(object sender, EventArgs e)
+		var duration = DateTime.Now - _pressed;
+
+		if (duration.TotalMilliseconds > 500) {
+			var result = await DisplayAlert("Delete Contact", "Are you sure?", accept: "Yes", cancel: "No");
+			if (result) {	
+				_appManager.MessageSenseData.Contacts.Remove(contact);
+				await _appManager.MessageSenseData.SaveChangesAsync();
+				PopulateContacts();
+            } else { return; }
+        } else {
+			App.Current.MainPage = new MessagePage(_appManager, contact);
+		}
+    }
+
+	private async void ContactButtonClicked(object sender, EventArgs e)
     {
 		string contactId = ((Button)sender).BindingContext as string;
-		//App.Current.MainPage = new MsgPage(_appManager, contactId);
-		DisplayAlert("Contact", $"You chose contact: {contactId}", "Okay");
+		int cid = Convert.ToInt32(contactId);
+		var contact = await _appManager.MessageSenseData.Contacts.FirstOrDefaultAsync(m => m.Id == cid);
+		App.Current.MainPage = new MessagePage(_appManager, contact);
 
     }
 

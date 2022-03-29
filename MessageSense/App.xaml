@@ -9,6 +9,7 @@
             <Color x:Key="PrimaryColor">#1d66db</Color>
             <Color x:Key="SecondaryColor">Black</Color>
             <Color x:Key="TextColor">White</Color>
+            <Color x:Key="ElementColor">DarkGoldenrod</Color>
             
             <Style TargetType="Label">
                 <Setter Property="TextColor" Value="{DynamicResource PrimaryColor}" />

@@ -29,7 +29,8 @@
         <Entry x:Name="userNameEntry"
                VerticalOptions="Center"
                HorizontalOptions="Center"
-               WidthRequest="150"/>
+               WidthRequest="150"
+               TextColor="White"/>
         
         <Label Text="First Name"
                VerticalOptions="Center"
@@ -37,7 +38,8 @@
         <Entry x:Name="firstNameEntry"
                VerticalOptions="Center"
                HorizontalOptions="Center"
-               WidthRequest="150"/>
+               WidthRequest="150"
+               TextColor="White"/>
         
         <Label Text="Last Name"
                VerticalOptions="Center"
@@ -45,7 +47,8 @@
         <Entry x:Name="lastNameEntry"
                VerticalOptions="Center"
                HorizontalOptions="Center"
-               WidthRequest="150"/>
+               WidthRequest="150"
+               TextColor="White"/>
 
         <Button Text="Complete Setup"
                 Clicked="GetInputedData"

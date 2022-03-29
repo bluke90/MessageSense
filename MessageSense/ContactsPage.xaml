@@ -32,12 +32,13 @@
                 FontSize="Medium"
                 FontAttributes="Bold"
                 WidthRequest="150"
-                Margin="5"/>
+                VerticalOptions="CenterAndExpand"/>
 
             <Button
                 Text="Add Contact"
                 TextColor="White"
-                FontSize="Micro"
+                FontSize="Caption"
+                FontAttributes="Bold"
                 BackgroundColor="Black"
                 CornerRadius="5"
                 BorderColor="DarkGoldenrod"
@@ -47,22 +48,51 @@
                 Grid.Column="0"
                 WidthRequest="100"
                 HeightRequest="40"
-                Margin="5"/>
+                Margin="5"
+                VerticalOptions="CenterAndExpand"/>
+
+            <Frame
+                Grid.Row="0"
+                Grid.Column="2"
+                VerticalOptions="Center"
+                HorizontalOptions="End"
+                BackgroundColor="#181818"
+                BorderColor="DarkGoldenrod"
+                WidthRequest="115"
+                HeightRequest="70"
+                Margin="8"
+                Padding="4">
+
+                <StackLayout>
+                  <Label x:Name="contactToken"
+                       FontSize="Caption"
+                       FontAttributes="Bold"
+                       VerticalTextAlignment="Center"
+                       HorizontalTextAlignment="Center"
+                       TextColor="White"
+                       HorizontalOptions="End"
+                       VerticalOptions="Center"/>
+                </StackLayout>
+
+            </Frame>
+
         </Grid>
 
 
         <Frame
-            BackgroundColor="Black"
+            BackgroundColor="#181818"
             CornerRadius="5"
-            BorderColor="MediumBlue"
+            BorderColor="{DynamicResource PrimaryColor}"
             Grid.Column="0"
-            Grid.Row="1">
+            Grid.Row="1"
+            Margin="4"
+            Padding="2">
 
             <VerticalStackLayout
                 VerticalOptions="FillAndExpand"
                 HorizontalOptions="FillAndExpand"
                 x:Name="contactStack"
-                Spacing="10"/>
+                Spacing="2"/>
         </Frame>
 
     </Grid>

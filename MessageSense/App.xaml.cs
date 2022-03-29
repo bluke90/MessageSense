@@ -11,6 +11,7 @@ public partial class App : Application
 
 		InitializeComponent();
 
+		
 
 		var user = Microsoft.Maui.Essentials.Preferences.Get("username", null);
 		var fName = Microsoft.Maui.Essentials.Preferences.Get("firstName", null);

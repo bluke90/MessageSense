@@ -16,7 +16,7 @@
                 HorizontalOptions="Center" />
 
             <Label 
-                Text="Current count: 0"
+                Text="New Messages:"
                 Grid.Row="1"
                 FontSize="18"
                 FontAttributes="Bold"
@@ -29,13 +29,6 @@
                 Grid.Row="2"
                 Clicked="OnContactsPage"
                 HorizontalOptions="CenterAndExpand"/>
-
-            <Image Grid.Row="3"
-                Source="dotnet_bot.png"
-                SemanticProperties.Description="Cute dot net bot waving hi to you!"
-                WidthRequest="250"
-                HeightRequest="310"
-                HorizontalOptions="Center" />
 
         </Grid>
     </ScrollView>

@@ -13,6 +13,7 @@ namespace MessageSense.Data
     public class MessageSenseData :DbContext
     {
         public DbSet<Models.Contact> Contacts { get; set; }
+        public DbSet<Models.Message> Messages { get; set; }
 
         public MessageSenseData()
         {
