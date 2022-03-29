@@ -32,7 +32,7 @@
                 FontSize="Medium"
                 FontAttributes="Bold"
                 WidthRequest="150"
-                Margin="20 0 10 0"/>
+                Margin="5"/>
 
             <Button
                 Text="Add Contact"
@@ -47,7 +47,7 @@
                 Grid.Column="0"
                 WidthRequest="100"
                 HeightRequest="40"
-                Margin="20 20 20 10"/>
+                Margin="5"/>
         </Grid>
 
 
