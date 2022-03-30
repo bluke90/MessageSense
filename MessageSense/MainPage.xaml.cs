@@ -9,6 +9,7 @@ public partial class MainPage : ContentPage
 	{
 		InitializeComponent();
 		_appManager = appManager;
+		CountNewMessages();
 	}
 
 	private void CountNewMessages()
