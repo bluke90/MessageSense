@@ -64,15 +64,14 @@
                 VerticalOptions="FillAndExpand"
                 Spacing="0">
                 
-                <Entry
-                    x:Name="msgEntry"
+                <Editor x:Name="msgEntry"
                     Placeholder="Message..."
                     VerticalOptions="FillAndExpand"
                     HorizontalOptions="StartAndExpand"
                     WidthRequest="275"
                     HeightRequest="250"
                     TextColor="White"
-                    PlaceholderColor="White"
+                    PlaceholderColor="#383838"
                     BackgroundColor="#151515"
                     FontSize="Medium"
                     VerticalTextAlignment="Start"/>
@@ -84,7 +83,7 @@
                     TextColor="White"
                     BorderColor="DarkGoldenrod"
                     BorderWidth="2"
-                    VerticalOptions="CenterAndExpand"
+                    VerticalOptions="Center"
                     HorizontalOptions="EndAndExpand"
                     WidthRequest="65"
                     HeightRequest="45"

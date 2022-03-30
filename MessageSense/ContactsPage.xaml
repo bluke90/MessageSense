@@ -32,7 +32,8 @@
                 FontSize="Medium"
                 FontAttributes="Bold"
                 WidthRequest="150"
-                VerticalOptions="CenterAndExpand"/>
+                VerticalOptions="Center"
+                Margin="-6"/>
 
             <Button
                 Text="Add Contact"
@@ -58,9 +59,9 @@
                 HorizontalOptions="End"
                 BackgroundColor="#181818"
                 BorderColor="DarkGoldenrod"
-                WidthRequest="112"
-                HeightRequest="70"
-                Margin="8"
+                WidthRequest="105"
+                HeightRequest="55"
+                Margin="5"
                 Padding="4">
 
                 <StackLayout>

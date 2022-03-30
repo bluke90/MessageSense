@@ -13,7 +13,7 @@ public partial class ContactsPage : ContentPage
 		PopulateContacts();
 
 		string myToken = Microsoft.Maui.Essentials.Preferences.Get("token", "");
-		contactToken.Text = $"Contact Token: \n  {myToken.ToString()}";
+		contactToken.Text = $"Contact Token:\n {myToken.ToString()}";
 	}
 
 	private List<Models.Contact> _contacts;
