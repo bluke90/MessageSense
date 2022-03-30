@@ -15,6 +15,16 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         
+        <Image Source="account_circle_white.svg"
+               Grid.Column="0"
+               Grid.ColumnSpan="2"
+               Grid.Row="0"
+               HorizontalOptions="Center"
+               VerticalOptions="Start"
+               WidthRequest="50"
+               HeightRequest="50"
+               Margin="8"/>
+
         <Label x:Name="ContactName"
                FontSize="Title"
                FontAttributes="Bold"
@@ -25,21 +35,15 @@
                Grid.ColumnSpan="2"
                Grid.Row="0"/>
 
-        <Button
-            Text="Back"
-            TextColor="White"
-            BackgroundColor="Black"
-            BorderColor="{DynamicResource ElementColor}"
-            BorderWidth="1"
+        <ImageButton Source="arrow_back_white.svg"
             WidthRequest="65"
             HeightRequest="40"
             Padding="2"
             HorizontalOptions="StartAndExpand"
             VerticalOptions="CenterAndExpand"
             Margin="5"
-            FontAttributes="Bold"
             Clicked="OnGoBack"/>
-
+        
         <Frame
             Grid.Column="0"
             Grid.ColumnSpan="2"

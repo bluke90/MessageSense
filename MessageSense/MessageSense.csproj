@@ -56,6 +56,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\account_circle.svg" />
+	  <None Remove="Resources\Images\account_circle_white.svg" />
+	  <None Remove="Resources\Images\arrow_back_white.svg" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.3" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.3">
