@@ -14,11 +14,9 @@ public partial class ContactsPage : ContentPage
 
 		string myToken = Microsoft.Maui.Essentials.Preferences.Get("token", "");
 		contactToken.Text = $"Contact Token: \n  {myToken.ToString()}";
-
 	}
 
 	private List<Models.Contact> _contacts;
-
 	private DateTime _pressed;
 
 	private async void PopulateContacts()
@@ -31,13 +29,11 @@ public partial class ContactsPage : ContentPage
 				contactStack.Add(btn);
 			}
 		}
-
     }
 
 	private Button GenerateContactButton(Models.Contact contact)
     {
-		Button button = new Button()
-		{
+		Button button = new Button() {
 			Text = contact.Name,
 			FontAttributes = FontAttributes.Bold,
 			FontSize = 20,

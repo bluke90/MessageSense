@@ -26,7 +26,7 @@
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
             
-            <Label Text="Select a contact:"
+            <Label Text="Select a Contact:"
                 Grid.Row="0"
                 Grid.Column="1"
                 FontSize="Medium"
@@ -58,7 +58,7 @@
                 HorizontalOptions="End"
                 BackgroundColor="#181818"
                 BorderColor="DarkGoldenrod"
-                WidthRequest="115"
+                WidthRequest="112"
                 HeightRequest="70"
                 Margin="8"
                 Padding="4">

@@ -16,11 +16,11 @@
                 HorizontalOptions="Center" />
 
             <Label 
+                x:Name="newMsgLbl"
                 Text="New Messages:"
                 Grid.Row="1"
                 FontSize="18"
                 FontAttributes="Bold"
-                x:Name="CounterLabel"
                 HorizontalOptions="Center" />
 
             <Button 

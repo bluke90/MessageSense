@@ -13,5 +13,6 @@ namespace MessageSense.Models
         public string SenderToken { get; set; }
         public DateTime DateTime { get; set; }
         public string Data { get; set; }
+        public bool Read { get; set; }
     }
 }
