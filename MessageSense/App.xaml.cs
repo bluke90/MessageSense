@@ -31,9 +31,9 @@ public partial class App : Application
 		Models.Message message = new Models.Message()
 		{
 			DateTime = DateTime.Now,
-			RecipientToken = "22685625",
-			Data = "Hello! how's it going?",
-			SenderToken = "0001",
+			RecipientToken = "0001",
+			Data = "It's going good! How about yourself??",
+			SenderToken = "18580206",
 			Read = false
 		};
 
