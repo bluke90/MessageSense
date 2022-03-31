@@ -124,7 +124,7 @@ namespace MessageSenseServer.Components.Net
 
                     // Handle Packet
 
-                    state.AnalyzeInboundPacket();
+                    state.GeneratePacketFromStateObj();
 
 
 

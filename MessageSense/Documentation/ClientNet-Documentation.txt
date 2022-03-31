@@ -1,0 +1,27 @@
+﻿MessageSense ClientNet Documentation
+
+
+
+	Definitions:
+		* Connection Instance - a single connection instance includes 2 messages. Message from the client to the 
+			server, and another message from the server back to the client
+		* 
+
+	Packet Info:
+		Contact Token, Current Encryption token, Task Code, Request Data
+	Server Response Packet Info:
+		Contact Token, New Encryption Token, Task Code, Response Data
+
+
+
+	- Server Task Codes
+		- Request
+		    * Contact Token Request => Req.0000
+			* Messages Request => Req.0001
+			* Store Messages Request => Req.0002 | {msg_data, sender token, recipient token}
+			* Request For Token Authentication => Auth.00
+			* Request for New Auth Token => Auth.01
+		- Responses
+			* Messages Received => Cmd.0000 | {msg1_id, msg2_id, ....}
+			* New Auth Token Received => Cmd.0001 | {first-4-of-token}
+			* Contact Token Received => Cmd.0002 | {contactToken, userName}
