@@ -12,13 +12,23 @@
 	Server Response Packet Info:
 		Contact Token, New Encryption Token, Task Code, Response Data
 
+	Request Structure:
+		
+
+	Response Strucutre:
+
+
+	Client Packet Data Structure:
+		" TaskCode, EncryptionToken, (Sender)ContactToken, (Recipient)ContactToken, Data={TaskObj} "
+
+
 
 
 	- Server Task Codes
 		- Request
 		    * Contact Token Request => Req.0000
 			* Messages Request => Req.0001
-			* Store Messages Request => Req.0002 | {msg_data, sender token, recipient token}
+			* Store Message Request => Req.0002 | {msg_data, sender token, recipient token}
 			* Request For Token Authentication => Auth.00
 			* Request for New Auth Token => Auth.01
 		- Responses

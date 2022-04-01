@@ -12,9 +12,11 @@ namespace MessageSenseServer.Components.Net
         public int Id { get; set; }
         public AppUser User { get; set; }
         public Socket ClientSocket { get; set; } 
-        public string Data { get; set; }
+        public string Data { get; set; } // any searialized object - Ex. Message, Authentication, Request
         public string Resposne { get; set; }
+        public string TaskCode { get; set; }
     }
+
 
     public static class PacketHandler
     {
@@ -31,7 +33,7 @@ namespace MessageSenseServer.Components.Net
         {
             var data = packet.Data;
 
-
+                   
 
 
 
