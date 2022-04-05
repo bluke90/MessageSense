@@ -35,3 +35,6 @@
 			* Messages Received => Cmd.0000 | {msg1_id, msg2_id, ....}
 			* New Auth Token Received => Cmd.0001 | {first-4-of-token}
 			* Contact Token Received => Cmd.0002 | {contactToken, userName}
+
+	- Server Response Codes
+		- Error response => Err.0000

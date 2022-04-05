@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using MessageSenseServer.Components.Models;
+using MessageSenseServer.Components.Net;
 
 namespace MessageSenseServer.Components.Net
 {
@@ -33,10 +35,63 @@ namespace MessageSenseServer.Components.Net
         {
             var data = packet.Data;
 
+            var msg = MessageExtensions.DeserializeMessage(data);
+
+            var taskCode = packet.TaskCode;
+            var task = taskCode.Split('.')[0];
+            var code = taskCode.Split('.')[1];
+            switch (task)
+            {
+                case "Req":     // Request
+                    HandleRequestPacket(code, packet);
+                    break;
+                case "Auth":        //Authentication
+                    HandleAuthenticationPacket(code, packet);
+                    break;
+                case "Cmd":     // Response/Command
+                    HandleCmdPacket(code);
+                    break;
+            }
                    
-
-
-
         }
+
+        private static void HandleRequestPacket(string code, Packet packet)
+        {
+            switch(code)
+            {
+                case "0000":        // Contact token request
+                    packet.ProcessContactTokenRequest();
+                    break;
+                case "0001":        // Messages Request
+                    break;
+                case "0002":        // Store Message Request
+                    break;
+            }
+        }
+
+        private static void HandleAuthenticationPacket(string code, Packet packet)
+        {
+            switch (code)
+            {
+                case "00":        // Request for token authentication
+                    break;
+                case "01":        // Request for new authentication token
+                    break;
+            }
+        }
+
+        private static void HandleCmdPacket(string code)
+        {
+            switch (code)
+            {
+                case "0000":        // Messages Received
+                    break;
+                case "0001":        // New Auth Token Received
+                    break;
+                case "0002":        // Contact Token Received
+                    break;
+            }
+        }
+
     }
 }
