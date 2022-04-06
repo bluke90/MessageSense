@@ -24,10 +24,14 @@ namespace MessageSenseServer.Components.Net
     {
         public static void GeneratePacketFromStateObj(this StateObject state)
         {
+            var data = state.sb.ToString();
+            var splitData = data.Split(" | ");
+
             Packet packet = new Packet()
             {
                 ClientSocket = state.workSocket,
-                Data = state.sb.ToString(),
+                TaskCode = splitData[0],
+                Data = splitData[1]
             };
 
         }
@@ -52,7 +56,7 @@ namespace MessageSenseServer.Components.Net
                     HandleCmdPacket(code);
                     break;
             }
-                   
+            return;      
         }
 
         private static void HandleRequestPacket(string code, Packet packet)
@@ -67,6 +71,7 @@ namespace MessageSenseServer.Components.Net
                 case "0002":        // Store Message Request
                     break;
             }
+            return;
         }
 
         private static void HandleAuthenticationPacket(string code, Packet packet)
