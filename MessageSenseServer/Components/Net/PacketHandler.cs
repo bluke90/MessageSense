@@ -47,7 +47,7 @@ namespace MessageSenseServer.Components.Net
             switch (task)
             {
                 case "Req":     // Request
-                    HandleRequestPacket(code, packet);
+                    packet.HandleRequestPacket(code);
                     break;
                 case "Auth":        //Authentication
                     HandleAuthenticationPacket(code, packet);
@@ -59,7 +59,7 @@ namespace MessageSenseServer.Components.Net
             return;      
         }
 
-        private static void HandleRequestPacket(string code, Packet packet)
+        private static void HandleRequestPacket(this Packet packet, string code)
         {
             switch(code)
             {
