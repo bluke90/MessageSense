@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSense", "MessageSens
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSenseServer", "MessageSenseServer\MessageSenseServer.csproj", "{81388CAE-F7EA-4972-9C03-3073E6C5C0FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketTesting", "SocketTesting\SocketTesting.csproj", "{73A93420-8127-4CDF-8A45-0F8871AE01CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		a|Any CPU = a|Any CPU
@@ -29,6 +31,12 @@ Global
 		{81388CAE-F7EA-4972-9C03-3073E6C5C0FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81388CAE-F7EA-4972-9C03-3073E6C5C0FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81388CAE-F7EA-4972-9C03-3073E6C5C0FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73A93420-8127-4CDF-8A45-0F8871AE01CE}.a|Any CPU.ActiveCfg = Release|Any CPU
+		{73A93420-8127-4CDF-8A45-0F8871AE01CE}.a|Any CPU.Build.0 = Release|Any CPU
+		{73A93420-8127-4CDF-8A45-0F8871AE01CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73A93420-8127-4CDF-8A45-0F8871AE01CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73A93420-8127-4CDF-8A45-0F8871AE01CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73A93420-8127-4CDF-8A45-0F8871AE01CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

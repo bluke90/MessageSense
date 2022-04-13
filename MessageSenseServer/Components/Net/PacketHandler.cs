@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MessageSenseServer.Components.Models;
 using MessageSenseServer.Components.Net;
@@ -11,7 +12,6 @@ namespace MessageSenseServer.Components.Net
 {
     public class Packet
     {
-        public int Id { get; set; }
         public AppUser User { get; set; }
         public Socket ClientSocket { get; set; } 
         public string Data { get; set; } // any searialized object - Ex. Message, Authentication, Request
@@ -22,28 +22,35 @@ namespace MessageSenseServer.Components.Net
 
     public static class PacketHandler
     {
-        public static void GeneratePacketFromStateObj(this StateObject state)
+        public static Packet GeneratePacketFromStateObj(this StateObject state)
         {
             var data = state.sb.ToString();
             var splitData = data.Split(" | ");
 
-            Packet packet = new Packet()
-            {
+            var parsedData = new List<string>();
+            foreach (var group in splitData) {
+                if (group != "<EOF>") parsedData.Add(group);
+            }
+
+            Packet packet = new Packet() {
                 ClientSocket = state.workSocket,
-                TaskCode = splitData[0],
-                Data = splitData[1]
+                TaskCode = parsedData[0],
+                Data = parsedData[1]
             };
+            return packet;
 
         }
         public static void AnalyzeInboundPacket(this Packet packet)
         {
             var data = packet.Data;
 
-            var msg = MessageExtensions.DeserializeMessage(data);
+            //var msg = MessageExtensions.DeserializeMessage(data);
 
             var taskCode = packet.TaskCode;
             var task = taskCode.Split('.')[0];
             var code = taskCode.Split('.')[1];
+
+            // Handle Desearialization of packet -> Request, Response, Message
             switch (task)
             {
                 case "Req":     // Request
@@ -56,7 +63,7 @@ namespace MessageSenseServer.Components.Net
                     HandleCmdPacket(code);
                     break;
             }
-            return;      
+            return;
         }
 
         private static void HandleRequestPacket(this Packet packet, string code)

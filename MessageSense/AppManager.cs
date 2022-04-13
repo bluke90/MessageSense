@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessageSense.ClientNet;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,10 @@ namespace MessageSense
             MessageSenseData = new Data.MessageSenseData();
         }
 
+        public void StartNet()
+        {
+            Task.Run(() => AsyncConnector.StartClient());
+        }
 
 
     }

@@ -10,12 +10,6 @@ namespace MessageSense.ClientNet
 {
     public class Connector
     {
-        public static int Main(string[] args)
-        {
-            StartClient();
-            return 0;
-        }
-
         public static void StartClient()
         {
             byte[] bytes = new byte[1024];

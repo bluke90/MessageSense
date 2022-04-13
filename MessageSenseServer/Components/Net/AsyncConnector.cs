@@ -38,7 +38,9 @@ namespace MessageSenseServer.Components.Net
             // The DNS name of the computer  
             // running the listener is "host.contoso.com".  
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            IPAddress ipAddress = ipHostInfo.AddressList[3];
+            foreach (var ip in ipHostInfo.AddressList) Console.WriteLine(ip.ToString());
+            Console.WriteLine($"Using {ipAddress.ToString()}");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
             // Create a TCP/IP socket.  
@@ -122,14 +124,14 @@ namespace MessageSenseServer.Components.Net
                     Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
                         content.Length, content);
 
-                    // Handle Packet
-
-                    state.GeneratePacketFromStateObj();
-
+                    // GeneratePacket
+                    var packet = state.GeneratePacketFromStateObj();
+                    // Handle Packet | Req, Resp, Msg
+                    packet.AnalyzeInboundPacket();
 
 
                     // Echo the data back to the client.  
-                    Send(handler, content);
+                    Send(handler, packet.Resposne + " <EOF>");
                 }
                 else
                 {
@@ -171,11 +173,6 @@ namespace MessageSenseServer.Components.Net
             }
         }
 
-        public static int Main(String[] args)
-        {
-            StartListening();
-            return 0;
-        }
 
 
     }

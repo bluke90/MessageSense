@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageSense.ClientNet
+namespace SocketTesting.ClientNet
 {
 
     public class StateObject
@@ -21,7 +21,7 @@ namespace MessageSense.ClientNet
         public StringBuilder sb = new StringBuilder();
     }
 
-    public class AsyncConnector
+    public class AsynchronousClient
     {
         // The port number for the remote device.  
         private const int port = 11000;
@@ -37,11 +37,16 @@ namespace MessageSense.ClientNet
         // The response from the remote device.  
         private static String response = String.Empty;
 
-        public static void StartClient()
+        public static string StartClient(string data)
         {
             // Connect to a remote device.  
-            try {
+            try
+            {
+                // Establish the remote endpoint for the socket.  
+                // The name of the
+                // remote device is "host.contoso.com".  
                 IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
+                Console.WriteLine(ipAddress.ToString());
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
                 // Create a TCP/IP socket.  
@@ -54,7 +59,8 @@ namespace MessageSense.ClientNet
                 connectDone.WaitOne();
 
                 // Send test data to the remote device.  
-                Send(client, "This is a test<EOF>");
+                Console.WriteLine($"Sending => {data})");
+                Send(client, $"{data} | <EOF>");
                 sendDone.WaitOne();
 
                 // Receive the response from the remote device.  
@@ -67,12 +73,13 @@ namespace MessageSense.ClientNet
                 // Release the socket.  
                 client.Shutdown(SocketShutdown.Both);
                 client.Close();
-
+                return response;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
+            throw new Exception("Error receiving Response or Sending Data....");
         }
 
         private static void ConnectCallback(IAsyncResult ar)
@@ -181,12 +188,6 @@ namespace MessageSense.ClientNet
             {
                 Console.WriteLine(e.ToString());
             }
-        }
-
-        public static void SendMessage()
-        {
-            StartClient();
-            return;
         }
     }
 }

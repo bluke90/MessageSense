@@ -21,6 +21,8 @@ namespace MessageSenseServer.Components.Net
         public static async void ProcessContactTokenRequest(this Packet packet)
         {
             var user = AppUserExtensions.DeserializeAppUserObj(packet.Data);
+            
+
 
             // did user provide the following - username, firstname
             if (user == null || string.IsNullOrEmpty(user.ContactToken) || string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.FirstName))
@@ -32,7 +34,7 @@ namespace MessageSenseServer.Components.Net
             ServerContext context = new ServerContext();
             // Check that contact token is unuique
             var _appUser = await context.Users.Where(u => u.ContactToken == user.ContactToken).FirstOrDefaultAsync();
-            if (_appUser.ContactToken == user.ContactToken)
+            if (_appUser != null)
             {
                 packet.PacketException("0001");
                 return;

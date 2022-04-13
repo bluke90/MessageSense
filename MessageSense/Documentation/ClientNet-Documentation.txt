@@ -13,13 +13,13 @@
 		Contact Token, New Encryption Token, Task Code, Response Data
 
 	Request Structure:
-		
+		* (Task)Code, Data
 
 	Response Strucutre:
 
 
-	Client Packet Data Structure:
-		" TaskCode, EncryptionToken, (Sender)ContactToken, (Recipient)ContactToken, Data={TaskObj} "
+	Client Packet Structure:
+		" Task, EncryptionToken, Data={TaskObj} "
 
 
 

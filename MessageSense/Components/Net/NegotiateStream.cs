@@ -13,7 +13,7 @@ namespace MessageSense.Components.Net
     {
         static TcpClient client = null;
 
-        public static void Main(String[] args)
+        public static void StartTcpClient(String[] args)
         {
             // Establish the remote endpoint for the socket.
             // For this example, use the local machine.
