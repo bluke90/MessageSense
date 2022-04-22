@@ -1,3 +1,6 @@
+using MessageSense.ClientNet;
+using Microsoft.Maui.Storage;
+
 namespace MessageSense;
 
 public partial class SetupPage : ContentPage
@@ -10,37 +13,29 @@ public partial class SetupPage : ContentPage
 		_appManager = appManager;
 	}
 
-	private void GetInputedData(object sender, EventArgs e)
+	private async void GetInputedData(object sender, EventArgs e)
     {
 		var username = userNameEntry.Text;
 		var firstName = firstNameEntry.Text;
 		var lastName = lastNameEntry.Text;
 
-		Microsoft.Maui.Essentials.Preferences.Set("username", username);
-		Microsoft.Maui.Essentials.Preferences.Set("firstName", firstName);
-		Microsoft.Maui.Essentials.Preferences.Set("lastName", lastName);
+		Preferences.Set("username", username);
+		Preferences.Set("firstName", firstName);
+		Preferences.Set("lastName", lastName);
 
-		Microsoft.Maui.Essentials.Preferences.Set("token", GenerateContactToken());
+		try {
+			var appUser = await Authentication.NewUserNegotiation(username, firstName);
+			var prefData = appUser.SerializeAppUserObj();
 
+			Preferences.Set("appUser", prefData);
+			Preferences.Set("contactToken", appUser.ContactToken);
+			Application.Current.MainPage = new MainPage(_appManager);
+			return;
+		} catch (Exception _) {
+			await DisplayAlert("Error in server client negotiation", "Try again later", "okay");
+			Application.Current.MainPage = new SetupPage(_appManager);
+        }
 
-		Application.Current.MainPage = new MainPage(_appManager);
 	}
 
-	private static string GenerateContactToken()
-    {
-		int[] tokenArray = new int[8];
-
-		Random rand = new Random();
-
-		for (int i = 0; i < tokenArray.Length; i++)
-        {
-			tokenArray[i] = rand.Next(10);
-        }
-		string token = string.Empty;
-		foreach(int numb in tokenArray)
-        {
-			token += numb.ToString();
-        }
-		return token;
-    }
 }

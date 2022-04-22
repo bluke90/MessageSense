@@ -51,33 +51,23 @@
 
 	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<!-- Required - WinUI does not yet have buildTransitive for everything -->
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0" />
-		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.0.30" />
+		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.1" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.3" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.3">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
+	  <None Remove="Resources\Images\account_circle.svg" />
+	  <None Remove="Resources\Images\account_circle_white.svg" />
+	  <None Remove="Resources\Images\arrow_back_white.svg" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Properties\Resources.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Resources.resx</DependentUpon>
-	  </Compile>
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.4" />
+
 	</ItemGroup>
 
-	<ItemGroup>
-	  <EmbeddedResource Update="Properties\Resources.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	</ItemGroup>
+
 
 	<ItemGroup>
 	  <MauiXaml Update="ContactsPage.xaml">
@@ -91,9 +81,6 @@
 	  </MauiXaml>
 	</ItemGroup>
 
-	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
-		<OutputType>WinExe</OutputType>
-		<RuntimeIdentifier>win10-x64</RuntimeIdentifier>
-	</PropertyGroup>
+
 	
 </Project>

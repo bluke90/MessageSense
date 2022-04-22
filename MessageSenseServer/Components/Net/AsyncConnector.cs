@@ -37,9 +37,7 @@ namespace MessageSenseServer.Components.Net
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
             // running the listener is "host.contoso.com".  
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[3];
-            foreach (var ip in ipHostInfo.AddressList) Console.WriteLine(ip.ToString());
+            IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
             Console.WriteLine($"Using {ipAddress.ToString()}");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
@@ -96,7 +94,7 @@ namespace MessageSenseServer.Components.Net
                 new AsyncCallback(ReadCallback), state);
         }
 
-        public static void ReadCallback(IAsyncResult ar)
+        public static async void ReadCallback(IAsyncResult ar)
         {
             String content = String.Empty;
 
@@ -127,11 +125,12 @@ namespace MessageSenseServer.Components.Net
                     // GeneratePacket
                     var packet = state.GeneratePacketFromStateObj();
                     // Handle Packet | Req, Resp, Msg
-                    packet.AnalyzeInboundPacket();
+                    await packet.AnalyzeInboundPacket();
 
 
                     // Echo the data back to the client.  
-                    Send(handler, packet.Resposne + " <EOF>");
+                    Send(handler, packet.Resposne);
+                    Console.WriteLine("Sent: " + packet.Resposne);
                 }
                 else
                 {

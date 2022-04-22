@@ -58,7 +58,7 @@ namespace SocketTesting.ClientNet
                     new AsyncCallback(ConnectCallback), client);
                 connectDone.WaitOne();
 
-                // Send test data to the remote device.  
+                // Send data to the remote device.  
                 Console.WriteLine($"Sending => {data})");
                 Send(client, $"{data} | <EOF>");
                 sendDone.WaitOne();

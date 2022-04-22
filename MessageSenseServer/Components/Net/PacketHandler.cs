@@ -40,7 +40,7 @@ namespace MessageSenseServer.Components.Net
             return packet;
 
         }
-        public static void AnalyzeInboundPacket(this Packet packet)
+        public static async Task AnalyzeInboundPacket(this Packet packet)
         {
             var data = packet.Data;
 
@@ -54,35 +54,38 @@ namespace MessageSenseServer.Components.Net
             switch (task)
             {
                 case "Req":     // Request
-                    packet.HandleRequestPacket(code);
+                    await packet.HandleRequestPacket(code);
                     break;
                 case "Auth":        //Authentication
-                    HandleAuthenticationPacket(code, packet);
+                    await HandleAuthenticationPacket(code, packet);
                     break;
                 case "Cmd":     // Response/Command
-                    HandleCmdPacket(code);
+                    await HandleCmdPacket(code);
                     break;
             }
             return;
         }
 
-        private static void HandleRequestPacket(this Packet packet, string code)
+        private static async Task HandleRequestPacket(this Packet packet, string code)
         {
             switch(code)
             {
                 case "0000":        // Contact token request
-                    packet.ProcessContactTokenRequest();
+                    await packet.ProcessContactTokenRequest();
                     break;
                 case "0001":        // Messages Request
+                    await packet.ProcessMessagePullRequest();
                     break;
                 case "0002":        // Store Message Request
+                    await packet.ProcessMessageStoreRequest();
                     break;
             }
             return;
         }
 
-        private static void HandleAuthenticationPacket(string code, Packet packet)
+        private static async Task HandleAuthenticationPacket(string code, Packet packet)
         {
+            await Task.Yield();
             switch (code)
             {
                 case "00":        // Request for token authentication
@@ -92,8 +95,9 @@ namespace MessageSenseServer.Components.Net
             }
         }
 
-        private static void HandleCmdPacket(string code)
+        private static async Task HandleCmdPacket(string code)
         {
+            await Task.Yield();
             switch (code)
             {
                 case "0000":        // Messages Received

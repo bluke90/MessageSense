@@ -4,22 +4,21 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Text;
 using SocketTesting.ClientNet;
+using SocketTesting;
 
+//AppManager app = new AppManager();
 
-var contactToken = "41882173";
+// Thread.Sleep(2);
 
-var packet = PacketUtils.GeneratePacket();
-packet.GenerateContactTokenRequest(contactToken, "bluke", "blake");
+// var user = await Authentication.NewUserNegotiation("bluke", "blake");
 
-var resp = packet.TransmistPacket();
+// Send Message
 
-// Handle Response
+var list = new List<int>() { 12, 22, 25 };
 
+var strList = string.Join(" <|> ", list);
 
-Console.ReadLine();
-
-
-
+Console.WriteLine(strList);
 
 
 

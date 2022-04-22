@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Microsoft.Maui;
 
 
 
-namespace SocketTesting.ClientNet
+
+namespace MessageSense.ClientNet
 {
     public class Packet
     {
@@ -47,10 +49,27 @@ namespace SocketTesting.ClientNet
         }
 
         // TaskObjects
-        public static void GenerateMessageStoreRequest(this Packet packet, Message msg)
+        public static async Task GenerateMessageStoreRequest(this Packet packet, Message msg, AppUser user)
         {
-            packet.Data = JsonSerializer.Serialize(msg);
+            await Task.Yield();
+            packet.Data = $"{JsonSerializer.Serialize(msg)} -- {user.CurrentAuthToken} -- {user.Id}";
             packet.TaskCode = "Req.0002";
+            return;
+        }
+        public static void GenerateMessageReceivedConfirmation(this Packet packet, List<int> msg_ids, AppUser user)
+        {
+            if (msg_ids.Count > 1) {
+                packet.Data = $"{string.Join(" <|> ", msg_ids)} -- {user.CurrentAuthToken} -- {user.Id}";
+            } else {
+                packet.Data = $"{msg_ids[0].ToString()} -- {user.CurrentAuthToken} -- {user.Id}";
+            }
+                packet.TaskCode = "Cmd.0000";
+            return;
+        }
+        public static void GenerateMessagePullRequest(this Packet packet, Models.Contact contact, AppUser user)
+        {
+            packet.Data = $"{contact.Token} -- {user.CurrentAuthToken} -- {user.Id}";
+            packet.TaskCode = "Req.0001";
             return;
         }
 

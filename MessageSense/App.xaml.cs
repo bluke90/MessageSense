@@ -1,4 +1,7 @@
-﻿namespace MessageSense;
+﻿using Microsoft.Maui;
+
+
+namespace MessageSense;
 
 public partial class App : Application
 {
@@ -11,14 +14,12 @@ public partial class App : Application
 
 		InitializeComponent();
 
-		
+		var user = Preferences.Get("username", null);
+		var fName = Preferences.Get("firstName", null);
+		var lName = Preferences.Get("lastName", null);
+		var appUser = Preferences.Get("appUser", null);
 
-		var user = Microsoft.Maui.Essentials.Preferences.Get("username", null);
-		var fName = Microsoft.Maui.Essentials.Preferences.Get("firstName", null);
-		var lName = Microsoft.Maui.Essentials.Preferences.Get("lastName", null);
-
-		if (user == null || fName == null || lName == null)
-		{
+		if (user == null || fName == null || lName == null || appUser == null) {
 			MainPage = new SetupPage(_appManager);
 		} else
         {

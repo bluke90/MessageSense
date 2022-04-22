@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using MessageSenseServer.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace MessageSenseServer.Components.Net
 {
@@ -28,6 +30,16 @@ namespace MessageSenseServer.Components.Net
             var obj = JsonSerializer.Deserialize<AppUser>(appUserData);
             return obj;
 
+        }
+
+        public static async Task<AppUser> GetAppUser(this Packet packet)
+        {
+            var userId = packet.Data.Split(" -- ")[2];
+
+            ServerContext context = new ServerContext();
+            var user = await context.Users.FirstOrDefaultAsync(m => m.Id == Convert.ToInt32(userId));
+            if (user == null) throw new NullReferenceException();
+            return user;
         }
 
     }

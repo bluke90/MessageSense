@@ -29,12 +29,14 @@
 		    * Contact Token Request => Req.0000
 			* Messages Request => Req.0001
 			* Store Message Request => Req.0002 | {msg_data, sender token, recipient token}
-			* Request For Token Authentication => Auth.00
+			* Request For Token Authentication => Auth.00 | {token, deviceId}
 			* Request for New Auth Token => Auth.01
 		- Responses
 			* Messages Received => Cmd.0000 | {msg1_id, msg2_id, ....}
+			* Messages pulled => Cmd.0003 | {msg_1-json} <|> {msg_2-json}
 			* New Auth Token Received => Cmd.0001 | {first-4-of-token}
 			* Contact Token Received => Cmd.0002 | {contactToken, userName}
 
 	- Server Response Codes
-		- Error response => Err.0000
+		- Error response => Err.0
+		- AuthenticationError => Exception.1000

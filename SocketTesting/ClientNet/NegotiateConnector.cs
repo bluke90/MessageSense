@@ -1,26 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
-namespace MessageSense.Components.Net
+namespace SocketTesting.ClientNet
 {
-    public class ASynchronousAuthenticatingTcpClient
+    public class NegotiateConnector
     {
         static TcpClient client = null;
 
-        public static void StartTcpClient(String[] args)
+        private static string AppUserAuthTokenData(AppUser appUser)
+        {
+            string authtoken = appUser.CurrentAuthToken;
+            string deviceId = "0123abcd";
+
+            var userData = JsonSerializer.Serialize<AppUser>(appUser);
+
+            string authData = $"{authtoken} | {deviceId} | {userData}";
+            return authData;
+        }
+
+        public static TcpClient AuthenticateClient(AppUser appUser)
         {
             // Establish the remote endpoint for the socket.
             // For this example, use the local machine.
-            IPHostEntry ipHostInfo = Dns.GetHostEntry("192.168.1.24");
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
-            // Client and server use port 11000.
-            IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
+            IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
+            // Client and server use port 11000
+            IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11001);
             // Create a TCP/IP socket.
             client = new TcpClient();
             // Connect the socket to the remote endpoint.
@@ -49,7 +60,7 @@ namespace MessageSense.Components.Net
             AuthenticatedStreamReporter.DisplayProperties(authStream);
             // Send a message to the server.
             // Encode the test data into a byte array.
-            byte[] message = Encoding.UTF8.GetBytes("Hello from the client.");
+            byte[] message = Encoding.UTF8.GetBytes(AppUserAuthTokenData(appUser));
             Task writeTask = authStream
                 .WriteAsync(message, 0, message.Length)
                 .ContinueWith(task =>
@@ -59,13 +70,30 @@ namespace MessageSense.Components.Net
 
             writeTask.Wait();
             Console.WriteLine("Sent {0} bytes.", message.Length);
+
+            // Read Success Message
+            Console.WriteLine("Authentication Response: ");
+
+            /*
+            Task readTask = authStream
+                .ReadAsync(message, 0, message.Length)
+                .ContinueWith(task =>
+                {
+                    var msgString = Encoding.UTF8.GetString(message);
+                    Console.WriteLine(msgString);
+                });
+            readTask.Wait();
+            */
+
             // Close the client connection.
             authStream.Close();
             Console.WriteLine("Client closed.");
+            return client;
         }
+
     }
 
-        // The following class displays the properties of an authenticatedStream.
+    // The following class displays the properties of an authenticatedStream.
     public class AuthenticatedStreamReporter
     {
         public static void DisplayProperties(AuthenticatedStream stream)
@@ -78,3 +106,4 @@ namespace MessageSense.Components.Net
         }
     }
 }
+

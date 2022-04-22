@@ -7,6 +7,8 @@ using System.Security.Principal;
 using System.Text;
 using System.IO;
 using System.Threading;
+using MessageSenseServer.Data;
+using MessageSenseServer.Components.Models;
 
 namespace MessageSenseServer.Components.Net
 {
@@ -15,7 +17,7 @@ namespace MessageSenseServer.Components.Net
         public static void Main()
         {
             // Create an IPv4 TCP/IP socket.
-            TcpListener listener = new TcpListener(IPAddress.Any, 11000);
+            TcpListener listener = new TcpListener(IPAddress.Parse("192.168.1.15"), 11001);
             // Listen for incoming connections.
             listener.Start();
             while (true)
@@ -23,12 +25,17 @@ namespace MessageSenseServer.Components.Net
                 TcpClient clientRequest;
                 // Application blocks while waiting for an incoming connection.
                 // Type CNTL-C to terminate the server.
+                Console.WriteLine("Listening");
                 clientRequest = listener.AcceptTcpClient();
                 Console.WriteLine("Client connected.");
                 // A client has connected.
                 try
                 {
                     AuthenticateClient(clientRequest);
+                    NetworkStream stream = clientRequest.GetStream();
+                    Console.WriteLine("Sending Success");
+                    var data = Encoding.UTF8.GetBytes("Success!! <EOF>");
+                    stream.Write(data, 0, data.Length);
                 }
                 catch (Exception e)
                 {
@@ -76,7 +83,7 @@ namespace MessageSenseServer.Components.Net
             readTask
                 .ContinueWith((task) => { EndReadCallback(cState, task.Result); })
                 .Wait();
-            // Finished with the current client.
+
             authStream.Close();
             clientRequest.Close();
         }
@@ -101,7 +108,9 @@ namespace MessageSenseServer.Components.Net
             // Read the client message.
             try
             {
+
                 cState.Message.Append(Encoding.UTF8.GetChars(cState.Buffer, 0, bytes));
+
                 if (bytes != 0)
                 {
                     Task<int> readTask = authStream.ReadAsync(cState.Buffer, 0, cState.Buffer.Length);
@@ -122,6 +131,15 @@ namespace MessageSenseServer.Components.Net
             }
             IIdentity id = authStream.RemoteIdentity;
             Console.WriteLine("{0} says {1}", id.Name, cState.Message.ToString());
+
+            // handle authenticated message
+            // cState.Message.ToString(); split(" | ") [0] = currentAuthToken , [1] = deviceId
+            string data = cState.Message.ToString();
+            try {
+                Authentication.AuthenticateUser(data);
+            } catch (Exception e) {
+                Console.WriteLine(e.ToString());
+            }
         }
     }
 

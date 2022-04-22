@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Maui.Storage;
 
 namespace MessageSense;
 
@@ -12,7 +13,7 @@ public partial class ContactsPage : ContentPage
 		_appManager = appManager;
 		PopulateContacts();
 
-		string myToken = Microsoft.Maui.Essentials.Preferences.Get("token", "");
+		string myToken = Preferences.Get("contactToken", "");
 		contactToken.Text = $"Contact Token:\n {myToken.ToString()}";
 	}
 
@@ -63,7 +64,7 @@ public partial class ContactsPage : ContentPage
 
 		var duration = DateTime.Now - _pressed;
 
-		if (duration.TotalMilliseconds > 500) {
+		if (duration.TotalMilliseconds > 1000) {
 			var result = await DisplayAlert("Delete Contact", "Are you sure?", accept: "Yes", cancel: "No");
 			if (result) {	
 				_appManager.MessageSenseData.Contacts.Remove(contact);
