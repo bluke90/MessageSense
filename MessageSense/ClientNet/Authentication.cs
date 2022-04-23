@@ -10,8 +10,9 @@ namespace MessageSense.ClientNet
     public static class Authentication
     {
 
-        public static async void AuthenticateClientDevice(this AppUser user)
+        public static void AuthenticateClientDevice(this AppUser user)
         {
+            throw new NotImplementedException();    
         }
 
         private static string AppUserAuthTokenData(AppUser appUser)

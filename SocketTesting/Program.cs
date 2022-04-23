@@ -14,11 +14,6 @@ using SocketTesting;
 
 // Send Message
 
-var list = new List<int>() { 12, 22, 25 };
-
-var strList = string.Join(" <|> ", list);
-
-Console.WriteLine(strList);
 
 
 

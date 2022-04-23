@@ -30,57 +30,71 @@ namespace MessageSense.ClientNet
             var packet = PacketUtils.GeneratePacket();
             await packet.GenerateMessageStoreRequest(msg, user);
             var resp = await packet.TransmitPacketAsync();
-            if (resp.Split(" | ")[0] == "Cmd.0000" && resp.Split(" | ")[1] == msg.Id.ToString()) {
+            if (resp.Split(NetControlChars.PrimarySeperator.Value)[0] == "Cmd.0000" && resp.Split(NetControlChars.PrimarySeperator.Value)[1] == msg.Id.ToString()) {
                 return;
             }
         }
-        public static async Task<int> SendPullMessageRequest(this Models.Contact contact, AppUser user)
+        public static async Task<int> SendPullMessageRequest(this Models.Contact contact, AppManager appManager)
         {
             var packet = PacketUtils.GeneratePacket();
-            packet.GenerateMessagePullRequest(contact, user);
-            var resp = await packet.TransmitPacketAsync();
-            
-            if (resp.Split(" | ")[0] == "Cmd.0004") return 0;
-            if (resp.Split(" | ")[0] != "Cmd.0003") throw new Exception();
+            await packet.GenerateMessagePullRequest(contact, appManager.AppUser);
 
-            var msgList = new List<Message>();
-            var msgIdList = new List<int>();
-
-            var msgs = resp.Split(" | ")[1];
-
-            if (msgs.Contains("<|>"))
+            try
             {
-                var msgArray = msgs.Split(" <|> ");
-                foreach (var msg in msgArray)
+                var resp = await packet.TransmitPacketAsync();
+                if (resp.Split(NetControlChars.PrimarySeperator.Value)[0] == "Cmd.0004") return 0;
+                if (resp.Split(NetControlChars.PrimarySeperator.Value)[0] != "Cmd.0003") throw new Exception($"Unkown TaskCode => {resp.Split(NetControlChars.PrimarySeperator.Value)[0]}");
+
+                var msgList = new List<Message>();
+                var msgIdList = new List<int>();
+
+                var msgs = resp.Split(NetControlChars.PrimarySeperator.Value)[1];
+
+                if (msgs.Contains(NetControlChars.DataObjSeperator.Value))
                 {
-                    var msgObj = JsonSerializer.Deserialize<Message>(msg);
-                    msgIdList.Add(msgObj.Id);
-                    msgList.Add(msgObj);
+                    var msgArray = msgs.Split(NetControlChars.DataObjSeperator.Value);
+                    foreach (var msg in msgArray)
+                    {
+                        var msgObj = JsonSerializer.Deserialize<Message>(msg);
+                        msgIdList.Add(msgObj.Id);
+                        msgList.Add(msgObj);
+                    }
                 }
-            } else {
-                var msgObj = JsonSerializer.Deserialize<Message>(msgs);
-                msgIdList.Add(msgObj.Id);
+                else
+                {
+                    var msgObj = JsonSerializer.Deserialize<Message>(msgs);
+                    msgIdList.Add(msgObj.Id);
+                }
+
+
+                // Send Messages Received Confirmation
+                await SendMessageReceivedConfirmation(msgIdList, appManager.AppUser);
+
+                var data = new Data.MessageSenseData();
+                await data.Messages.AddRangeAsync(msgList);
+                await data.SaveChangesAsync();
+
+                return msgList.Count;
+            } catch (Exception ex) {
+                Console.WriteLine("Unknown Exception in Method => SendPullMessageRequest | File => Message.cs | Line => 37");
+                Console.WriteLine(ex.ToString());
             }
-
-
-            // Send Messages Received Confirmation
-            await SendMessageReceivedConfirmation(msgIdList, user);
-
-            MessageSenseData data = new MessageSenseData();
-            var addTask = data.Messages.AddRangeAsync(msgList);
-            await data.SaveChangesAsync();
-            addTask.Wait();
-
-            return msgList.Count;
+            return 0;
         }
 
         private static async Task SendMessageReceivedConfirmation(List<int> msg_ids, AppUser user)
         {
-            var packet = PacketUtils.GeneratePacket();
-            packet.GenerateMessageReceivedConfirmation(msg_ids, user);
-            var resp = await packet.TransmitPacketAsync();
-            if (resp == "OK") {
-                return;
+            try
+            {
+                var packet = PacketUtils.GeneratePacket();
+                await packet.GenerateMessageReceivedConfirmation(msg_ids, user);
+                var resp = await packet.TransmitPacketAsync();
+                if (resp == "OK")
+                {
+                    return;
+                }
+            } catch(Exception ex) {
+                Console.WriteLine(ex.ToString());
             }
             // Confirmation not received
             

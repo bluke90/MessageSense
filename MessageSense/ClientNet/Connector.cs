@@ -14,7 +14,7 @@ namespace MessageSense.ClientNet
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public const int BufferSize = 256;
+        public const int BufferSize = 1024;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
@@ -40,8 +40,7 @@ namespace MessageSense.ClientNet
         public static string StartClient(string data)
         {
             // Connect to a remote device.  
-            try
-            {
+            try { 
                 // Establish the remote endpoint for the socket.  
                 // The name of the
                 // remote device is "host.contoso.com".  
@@ -70,13 +69,8 @@ namespace MessageSense.ClientNet
                 // Write the response to the console.  
                 Console.WriteLine("Response received : {0}", response);
 
-                // Release the socket.  
-                client.Shutdown(SocketShutdown.Both);
-                client.Close();
                 return response;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Console.WriteLine(e.ToString());
             }
             throw new Exception("Error receiving Response or Sending Data....");
@@ -84,35 +78,24 @@ namespace MessageSense.ClientNet
 
         private static void ConnectCallback(IAsyncResult ar)
         {
-            try
-            {
-                // Retrieve the socket from the state object.  
+            try {
                 Socket client = (Socket)ar.AsyncState;
 
-                // Complete the connection.  
-                client.EndConnect(ar);
+                client.EndConnect(ar);      // Complete connection.  
+                Console.WriteLine("Socket connected to {0}", client.RemoteEndPoint.ToString());
 
-                Console.WriteLine("Socket connected to {0}",
-                    client.RemoteEndPoint.ToString());
-
-                // Signal that the connection has been made.  
                 connectDone.Set();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Console.WriteLine(e.ToString());
             }
         }
 
         private static void Receive(Socket client)
         {
-            try
-            {
-                // Create the state object.  
+            try {
                 StateObject state = new StateObject();
                 state.workSocket = client;
 
-                // Begin receiving the data from the remote device.  
                 client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                     new AsyncCallback(ReceiveCallback), state);
             }
@@ -124,34 +107,27 @@ namespace MessageSense.ClientNet
 
         private static void ReceiveCallback(IAsyncResult ar)
         {
-            try
-            {
-                // Retrieve the state object and the client socket
-                // from the asynchronous state object.  
+            try {
                 StateObject state = (StateObject)ar.AsyncState;
                 Socket client = state.workSocket;
-
-                // Read data from the remote device.  
                 int bytesRead = client.EndReceive(ar);
 
-                if (bytesRead > 0)
-                {
-                    // There might be more data, so store the data received so far.  
+                if (bytesRead > 0) {
                     state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-                    // Get the rest of the data.  
                     client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                         new AsyncCallback(ReceiveCallback), state);
-                }
-                else
-                {
-                    // All the data has arrived; put it in response.  
+                } else {
+
                     if (state.sb.Length > 1)
                     {
                         response = state.sb.ToString();
                     }
-                    // Signal that all bytes have been received.  
+
                     receiveDone.Set();
+                    // Release the socket.  
+                    client.Shutdown(SocketShutdown.Both);
+                    client.Close();
+                    client = null;
                 }
             }
             catch (Exception e)
@@ -165,7 +141,6 @@ namespace MessageSense.ClientNet
             // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.ASCII.GetBytes(data);
 
-            // Begin sending the data to the remote device.  
             client.BeginSend(byteData, 0, byteData.Length, 0,
                 new AsyncCallback(SendCallback), client);
         }

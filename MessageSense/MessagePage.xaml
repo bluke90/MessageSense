@@ -14,7 +14,7 @@
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-
+        
         <Image Source="account_circle_white.svg"
                Grid.Column="0"
                Grid.ColumnSpan="2"

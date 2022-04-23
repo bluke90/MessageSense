@@ -60,7 +60,7 @@ namespace MessageSenseServer.Components.Net
                     await HandleAuthenticationPacket(code, packet);
                     break;
                 case "Cmd":     // Response/Command
-                    await HandleCmdPacket(code);
+                    await packet.HandleCmdPacket(code);
                     break;
             }
             return;
@@ -95,18 +95,20 @@ namespace MessageSenseServer.Components.Net
             }
         }
 
-        private static async Task HandleCmdPacket(string code)
+        private static async Task HandleCmdPacket(this Packet packet, string code)
         {
             await Task.Yield();
             switch (code)
             {
                 case "0000":        // Messages Received
+                    await packet.ProcessMessagesReceivedReqeust();
                     break;
                 case "0001":        // New Auth Token Received
                     break;
                 case "0002":        // Contact Token Received
                     break;
             }
+            return;
         }
 
     }

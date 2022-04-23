@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MessageSense.ClientNet;
+using System.Collections.ObjectModel;
 
 namespace MessageSense;
 
@@ -10,88 +11,103 @@ public partial class MessagePage : ContentPage
 
 	public bool isSending;
 
+
+	public ObservableCollection<Message> _messages;
+	public Queue<Message> _msgQueue;
+
+	private Thread _refreshThread;
+
+	private Data.MessageSenseData _context;
+
 	public MessagePage(AppManager appManager, Models.Contact contact)
 	{
 		InitializeComponent();
+		_context = new Data.MessageSenseData();
 		_appManager = appManager;
 		_contact = contact;
 		ContactName.Text = contact.Name;
-		PopulateMessages();
-		Task.Run(() => BackgroundRefreshThread());
+		_messages = new ObservableCollection<Message>();
+		_msgQueue = new Queue<Message>();
+		_messages.CollectionChanged += PopulateQueuedMessage;
+		_refreshThread = new Thread(() => BackgroundRefreshThread());
+		_refreshThread.Start();
 		isSending = false;
 	}
 
 	private async void BackgroundRefreshThread()
     {
-		while (true)
-        {
-			await Task.Delay(1000);
-			if (!isSending) {
-				try {
-					App.Current.Dispatcher.Dispatch(CheckForNewMessages);
-				} catch (Exception e) {
-					await DisplayAlert("Network Error", "Unable to check for new messages", "Ok");
-					break;
-				}
-			}
-			// End Loop
-        }
-    }
-
-	private List<Message> _sendMessages;
-	private List<Message> _recMessages;
-	private List<Message> _messages;
-
-	private async void PopulateMessages()
-    {
-		_messages = new List<Message>();
-
-		string myToken = _appManager.AppUser.ContactToken;
-		if (myToken == null || myToken == "0") throw new Exception("Error Retreiving Users Token...");
-		string contactToken = _contact.Token;
-
-		_messages = await _appManager.MessageSenseData.Messages.Where(m => m.SenderToken == contactToken || m.RecipientToken == contactToken).ToListAsync();
-
-		msgStack.Clear();
-
-		_messages = _messages.OrderBy(m => m.DateTime).ToList();
-		foreach (var msg in _messages)
+		var contactToken = _contact.Token;
+		try
 		{
-			var lbl = GenMsgLbl(msg, myToken);
-			msgStack.Add(lbl);
-		}
-	}
-	
-	private async void CheckForNewMessages()
-    {
-		var count = await _contact.SendPullMessageRequest(_appManager.AppUser);
+			var data = new Data.MessageSenseData();
+			while (true)
+			{
+				foreach (var message in await data.Messages
+					.Where(m => m.SenderToken == contactToken || m.RecipientToken == contactToken)
+					.OrderBy(m => m.DateTime).ToListAsync()) {
 
-		if (count > 0)
+					if (!_messages.Contains(message))
+					{
+						_msgQueue.Enqueue(message);
+						_messages.Add(message);
+					}
+				}
+				Thread.Sleep(1000);
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.ToString());
+			Thread.Sleep(1000);
+			BackgroundRefreshThread();
+		}
+    }
+
+	private void PopulateQueuedMessage(object sender, EventArgs args)
+    {
+		for (int i = 0; i <= _msgQueue.Count; i++)
         {
-			PopulateMessages();
+			var msg = _msgQueue.Dequeue(); // should peek and dequeue only if success
+			App.Current.Dispatcher.Dispatch(() => PopulateNewMessage(msg));
         }
     }
+
+
+	private void PopulateNewMessage(Message msg)
+    {
+		var lbl = GenMsgLbl(msg, _appManager.AppUser.ContactToken);
+		msgStack.Add(lbl);
+    }
+	
 
 	private async void OnSendMsg(object sender, EventArgs e)
     {
-		var msgData = msgEntry.Text;
-		if (msgData.Length == 0) return;
+		try
+		{
+			var msgData = msgEntry.Text;
+			if (msgData.Length == 0) return;
 
-		Message msg = new Message() {
-			Data = msgData,
-			DateTime = DateTime.Now,
-			SenderToken = _appManager.AppUser.ContactToken,
-			RecipientToken = _contact.Token
-		};
+			Message msg = new Message()
+			{
+				Data = msgData,
+				DateTime = DateTime.Now,
+				SenderToken = _appManager.AppUser.ContactToken,
+				RecipientToken = _contact.Token
+			};
 
-        _appManager.MessageSenseData.Messages.Add(msg);
-		_appManager.MessageSenseData.SaveChanges();
-		isSending = true;
-		await msg.SendStoreMessageRequest(_appManager.AppUser);
-		isSending = false;
-		PopulateMessages();
+			_context.Messages.Add(msg);
+			_context.SaveChanges();
+			_appManager.isSending = true;
+			await msg.SendStoreMessageRequest(_appManager.AppUser);
+			_appManager.isSending = false;
+		}catch (Exception ex)
+        {
+			Console.WriteLine("Exception Location Details: Method => OnSendMsg | File => MessagePage.Xaml.cs | Line => 84");
+			Console.WriteLine(ex.ToString());
+        }
 
-    }
+
+	}
 
 	private void OnGoBack(object sender, EventArgs e)
     {
@@ -119,6 +135,15 @@ public partial class MessagePage : ContentPage
 		return lbl;
 	}
 
+	private static async void ClearMessages(Models.Contact contact, Data.MessageSenseData context)
+    {
+		var _messages = await context.Messages.Where(m => m.SenderToken == contact.Token || m.RecipientToken == contact.Token).ToListAsync();
+		foreach (var msg in _messages)
+        {
+			context.Messages.Remove(msg);
+        }
+		await context.SaveChangesAsync();
+    }
 
 
 }

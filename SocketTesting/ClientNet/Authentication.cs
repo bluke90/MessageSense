@@ -12,10 +12,6 @@ namespace SocketTesting.ClientNet
 
         public static async void AuthenticateClientDevice(this AppUser user)
         {
-            NegotiateConnector.AuthenticateClient(user);
-
-
-
         }
 
         private static string AppUserAuthTokenData(AppUser appUser)
@@ -51,7 +47,9 @@ namespace SocketTesting.ClientNet
             var packet = PacketUtils.GeneratePacket();
             AppUser user; string resp;
 
-            while (true) {
+
+            while (true)
+            {
                 user = GenerateAppUser("bluke", "blake");
 
                 packet.GenerateContactTokenRequest(user);
@@ -59,10 +57,13 @@ namespace SocketTesting.ClientNet
                 resp = await packet.TransmitPacketAsync();
 
                 var resp_split = resp.Split(" | ");
-                if (resp_split[0] != "Cmd.0002"  || resp_split[1] == user.ContactToken || resp_split[2] == user.Username) break;
+                if (resp_split[0] != "Cmd.0002" || resp_split[1] == user.ContactToken || resp_split[2] == user.Username) break;
             }
             user.CurrentAuthToken = resp.Split(" | ")[3];
             user.Id = int.Parse(resp.Split(" | ")[4]);
+
+            if (user.CurrentAuthToken == null || user.CurrentAuthToken.Length < 1) throw new Exception("Connection Error");
+
             return user;
         }
 

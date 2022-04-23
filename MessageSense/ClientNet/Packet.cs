@@ -18,6 +18,20 @@ namespace MessageSense.ClientNet
         public string Response { get; set; }
     }
 
+    public class NetControlChars
+    {
+        private NetControlChars(string value) { Value = value; }
+
+        public string Value { get; private set; }
+
+        public static NetControlChars EndOfTransmission { get { return new NetControlChars(" <EOF>"); } }
+        public static NetControlChars PrimarySeperator { get { return new NetControlChars(" | "); } }
+        public static NetControlChars SecondarySeperator { get { return new NetControlChars(" -- "); } }
+        public static NetControlChars DataObjSeperator { get { return new NetControlChars(" <|> "); } }
+        public static NetControlChars Blank { get { return new NetControlChars(" ::: "); } }
+
+    }
+
     public static class PacketUtils
     {
         public static string SearializePacket(this Packet packet)
@@ -34,7 +48,7 @@ namespace MessageSense.ClientNet
 
         public static string TransmitPacket(this Packet packet)
         {
-            var data = $"{packet.TaskCode} | {packet.Data}";
+            var data = packet.TaskCode + NetControlChars.PrimarySeperator.Value + packet.Data;
 
             var resp_data = AsynchronousClient.StartClient(data);
             
@@ -56,19 +70,21 @@ namespace MessageSense.ClientNet
             packet.TaskCode = "Req.0002";
             return;
         }
-        public static void GenerateMessageReceivedConfirmation(this Packet packet, List<int> msg_ids, AppUser user)
+        public static async Task GenerateMessageReceivedConfirmation(this Packet packet, List<int> msg_ids, AppUser user)
         {
+            await Task.Yield();
             if (msg_ids.Count > 1) {
-                packet.Data = $"{string.Join(" <|> ", msg_ids)} -- {user.CurrentAuthToken} -- {user.Id}";
+                packet.Data = $"{string.Join(NetControlChars.DataObjSeperator.Value, msg_ids)} -- {user.CurrentAuthToken} -- {user.Id}";
             } else {
                 packet.Data = $"{msg_ids[0].ToString()} -- {user.CurrentAuthToken} -- {user.Id}";
             }
                 packet.TaskCode = "Cmd.0000";
             return;
         }
-        public static void GenerateMessagePullRequest(this Packet packet, Models.Contact contact, AppUser user)
+        public static async Task GenerateMessagePullRequest(this Packet packet, Models.Contact contact, AppUser user)
         {
-            packet.Data = $"{contact.Token} -- {user.CurrentAuthToken} -- {user.Id}";
+            await Task.Yield();
+            packet.Data = contact.Token + NetControlChars.SecondarySeperator.Value + user.CurrentAuthToken + NetControlChars.SecondarySeperator.Value + user.Id;
             packet.TaskCode = "Req.0001";
             return;
         }
@@ -77,7 +93,7 @@ namespace MessageSense.ClientNet
         {
             var deviceId = "ABC123";
             var userData = user.SerializeAppUserObj();
-            packet.Data = userData + " -- " + deviceId;
+            packet.Data = userData + NetControlChars.SecondarySeperator.Value + deviceId;
             packet.TaskCode = "Req.0000";
             return;
         }
