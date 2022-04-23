@@ -38,42 +38,34 @@ namespace MessageSense.ClientNet
         private static String response = String.Empty;
 
         public static string StartClient(string data)
-        {
-            // Connect to a remote device.  
-            try { 
-                // Establish the remote endpoint for the socket.  
-                // The name of the
-                // remote device is "host.contoso.com".  
+        { 
+            try {  
                 IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
                 Console.WriteLine(ipAddress.ToString());
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
-
-                // Create a TCP/IP socket.  
+ 
                 Socket client = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
-
-                // Connect to the remote endpoint.  
+                
                 client.BeginConnect(remoteEP,
                     new AsyncCallback(ConnectCallback), client);
                 connectDone.WaitOne();
-
-                // Send data to the remote device.  
+ 
                 Console.WriteLine($"Sending => {data})");
                 Send(client, $"{data} | <EOF>");
                 sendDone.WaitOne();
-
-                // Receive the response from the remote device.  
+  
                 Receive(client);
                 receiveDone.WaitOne();
-
-                // Write the response to the console.  
+ 
                 Console.WriteLine("Response received : {0}", response);
 
                 return response;
             } catch (Exception e) {
+                Console.WriteLine("!<Exceptionn Location Details> Method => AsynchrounusConnector.StartClient | File => Connector.cs | Line => 42");
                 Console.WriteLine(e.ToString());
             }
-            throw new Exception("Error receiving Response or Sending Data....");
+            return response;
         }
 
         private static void ConnectCallback(IAsyncResult ar)
@@ -123,8 +115,7 @@ namespace MessageSense.ClientNet
                         response = state.sb.ToString();
                     }
 
-                    receiveDone.Set();
-                    // Release the socket.  
+                    receiveDone.Set();  
                     client.Shutdown(SocketShutdown.Both);
                     client.Close();
                     client = null;
@@ -149,14 +140,11 @@ namespace MessageSense.ClientNet
         {
             try
             {
-                // Retrieve the socket from the state object.  
                 Socket client = (Socket)ar.AsyncState;
 
-                // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(ar);
                 Console.WriteLine("Sent {0} bytes to server.", bytesSent);
-
-                // Signal that all bytes have been sent.  
+  
                 sendDone.Set();
             }
             catch (Exception e)
