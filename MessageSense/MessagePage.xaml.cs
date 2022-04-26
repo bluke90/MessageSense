@@ -97,9 +97,8 @@ public partial class MessagePage : ContentPage
 
 			_context.Messages.Add(msg);
 			_context.SaveChanges();
-			_appManager.isSending = true;
-			await msg.SendStoreMessageRequest(_appManager.AppUser);
-			_appManager.isSending = false;
+
+			await msg.SendStoreMessageRequest(_appManager);
 		}catch (Exception ex)
         {
 			Console.WriteLine("Exception Location Details: Method => OnSendMsg | File => MessagePage.Xaml.cs | Line => 84");

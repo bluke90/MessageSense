@@ -5,19 +5,54 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using Microsoft.Maui;
-
-
-
+using System.Security.Cryptography;
 
 namespace MessageSense.ClientNet
 {
     public class Packet
     {
-        public string TaskCode { get; set; }
-        public string Data { get; set; }
-        public string Response { get; set; }
+        public ManualResetEvent isTransmiting= new ManualResetEvent(true);
+
+        public TaskCodes TaskCode { get; set; }
+        public PacketData Data { get; set; }
+
     }
 
+    public class PacketData
+    {
+        public int TransmissionId { get; set; }
+
+        // MainPacket => transmissionId | TaskCode | Data | <EOF>
+        // MainPacket.Data = Data -- authToken -- userId
+        public string TaskCode { get; set; }
+        public string Data { get; set; }
+        public string AuthToken { get; set; }
+        public int AppUserId { get; set; }
+
+    }
+
+    public class TaskCodes
+    {
+        private TaskCodes(string value) { Value = value; }
+
+        public string Value { get; private set; }
+
+        public static TaskCodes ContactTokenRequest { get { return new TaskCodes("Req.0000"); } }
+        public static TaskCodes MessagePullRequest { get { return new TaskCodes("Req.0001"); } }
+        public static TaskCodes StoreMessageRequest { get { return new TaskCodes("Req.0002"); } }
+        public static TaskCodes MessagesReceived { get { return new TaskCodes("Cmd.0000"); } }
+        public static TaskCodes NewAuthTokenReceived { get { return new TaskCodes("Cmd.0001"); } }
+        public static TaskCodes ContactTokenReceived { get { return new TaskCodes("Cmd.0002"); } }
+        public static TaskCodes MessagesPullReceived { get { return new TaskCodes("Cmd.0003"); } }
+
+        public static TaskCodes Parse(string taskCode) {
+            switch (taskCode) {
+                case "Req.0001":
+                    return TaskCodes.ContactTokenRequest;
+            }
+            return null;
+        }
+    }
     public class NetControlChars
     {
         private NetControlChars(string value) { Value = value; }
@@ -40,52 +75,74 @@ namespace MessageSense.ClientNet
             return data;
         }
 
+
         public static Packet GeneratePacket()
         {
             var packet = new Packet();
+            packet.Data = new PacketData()
+            {
+                TransmissionId = RandomNumberGenerator.GetInt32(100, 500),
+
+            };
             return packet;
         }
 
-        public static string TransmitPacket(this Packet packet)
+        public static Packet TransmitPacket(this Packet packet, AppUser user)
         {
-            var data = packet.TaskCode + NetControlChars.PrimarySeperator.Value + packet.Data;
+            Console.WriteLine($"Transmiting Packet Data with TransmissionId => {packet.Data.TransmissionId}");
+            Packet respPacket = null;
+            try {
+                packet.Data.AuthToken = user.CurrentAuthToken;
+                packet.Data.AppUserId = user.Id;
 
-            var resp_data = AsynchronousClient.StartClient(data);
-            
-            return resp_data;
+                var packetData = JsonSerializer.Serialize(packet.Data);
+
+                var resp_data = AsynchronousClient.StartClient(packetData);
+
+                var array = resp_data.Split(NetControlChars.PrimarySeperator.Value);
+                var respPacketData = JsonSerializer.Deserialize<PacketData>(array[0]);
+                respPacket = new Packet() { Data = respPacketData };
+                Console.WriteLine("Received: " + array[0]);
+
+                return respPacket;
+            } catch (Exception ex) {
+                Console.WriteLine("Exception Location => Packet.cs => PacketUtils.TransmitPacket");
+                Console.WriteLine(ex.ToString());
+            }
+            return respPacket;
         }
 
-        public static async Task<string> TransmitPacketAsync(this Packet packet)
+        public static async Task<Packet> TransmitPacketAsync(this Packet packet, AppUser appUser)
         {
             await Task.Yield();
-            var resp = TransmitPacket(packet);
+            var resp = packet.TransmitPacket(appUser);
             return resp;
         }
 
         // TaskObjects
-        public static async Task GenerateMessageStoreRequest(this Packet packet, Message msg, AppUser user)
+        public static async Task GenerateMessageStoreRequest(this Packet packet, Message msg)
         {
             await Task.Yield();
-            packet.Data = $"{JsonSerializer.Serialize(msg)} -- {user.CurrentAuthToken} -- {user.Id}";
-            packet.TaskCode = "Req.0002";
+            packet.Data.Data = $"{JsonSerializer.Serialize(msg)}";
+            packet.TaskCode = TaskCodes.StoreMessageRequest;
             return;
         }
-        public static async Task GenerateMessageReceivedConfirmation(this Packet packet, List<int> msg_ids, AppUser user)
+        public static async Task GenerateMessageReceivedConfirmation(this Packet packet, List<int> msg_ids)
         {
             await Task.Yield();
             if (msg_ids.Count > 1) {
-                packet.Data = $"{string.Join(NetControlChars.DataObjSeperator.Value, msg_ids)} -- {user.CurrentAuthToken} -- {user.Id}";
+                packet.Data.Data = $"{string.Join(NetControlChars.DataObjSeperator.Value, msg_ids)}";
             } else {
-                packet.Data = $"{msg_ids[0].ToString()} -- {user.CurrentAuthToken} -- {user.Id}";
+                packet.Data.Data = $"{msg_ids[0].ToString()}";
             }
-                packet.TaskCode = "Cmd.0000";
+            packet.TaskCode = TaskCodes.MessagesPullReceived;
             return;
         }
-        public static async Task GenerateMessagePullRequest(this Packet packet, Models.Contact contact, AppUser user)
+        public static async Task GenerateMessagePullRequest(this Packet packet, Models.Contact contact)
         {
             await Task.Yield();
-            packet.Data = contact.Token + NetControlChars.SecondarySeperator.Value + user.CurrentAuthToken + NetControlChars.SecondarySeperator.Value + user.Id;
-            packet.TaskCode = "Req.0001";
+            packet.Data.Data = contact.Token;
+            packet.TaskCode = TaskCodes.MessagePullRequest;
             return;
         }
 
@@ -93,8 +150,8 @@ namespace MessageSense.ClientNet
         {
             var deviceId = "ABC123";
             var userData = user.SerializeAppUserObj();
-            packet.Data = userData + NetControlChars.SecondarySeperator.Value + deviceId;
-            packet.TaskCode = "Req.0000";
+            packet.Data.Data = userData + NetControlChars.SecondarySeperator.Value + deviceId;
+            packet.TaskCode = TaskCodes.ContactTokenRequest;
             return;
         }
 

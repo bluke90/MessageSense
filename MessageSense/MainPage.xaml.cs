@@ -9,10 +9,14 @@ public partial class MainPage : ContentPage
 	{
 		InitializeComponent();
 		_appManager = appManager;
-		_appManager.SetAppUser();
-		CountNewMessages();
+		InitAppManagerServices();
 		CheckPermissions();
+		CountNewMessages();
 	}
+
+	private async void InitAppManagerServices() {
+		await _appManager.InitPacketHandler();
+    }
 
 	private void CountNewMessages()
 	{

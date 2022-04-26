@@ -17,6 +17,19 @@ namespace MessageSenseServer.Components.Net
         public string Data { get; set; } // any searialized object - Ex. Message, Authentication, Request
         public string Resposne { get; set; }
         public string TaskCode { get; set; }
+
+    }
+
+    public class PacketData {
+        public int TransmissionId { get; set; }
+
+        // MainPacket => transmissionId | TaskCode | Data | <EOF>
+        // MainPacket.Data = Data -- authToken -- userId
+        public string? TaskCode { get; set; }
+        public string? Data { get; set; }
+        public string? AuthToken { get; set; }
+        public int AppUserId { get; set; }
+
     }
 
 

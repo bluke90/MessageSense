@@ -14,7 +14,7 @@ namespace MessageSense.ClientNet
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public const int BufferSize = 1024;
+        public const int BufferSize = 256;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
@@ -78,6 +78,7 @@ namespace MessageSense.ClientNet
 
                 connectDone.Set();
             } catch (Exception e) {
+                Console.WriteLine("Exception Location => Connector.cs => AsynchronousClient.ConnectCallback");
                 Console.WriteLine(e.ToString());
             }
         }
@@ -93,6 +94,7 @@ namespace MessageSense.ClientNet
             }
             catch (Exception e)
             {
+                Console.WriteLine("Exception Location => Connector.cs => AsynchronousClient.Receive");
                 Console.WriteLine(e.ToString());
             }
         }
@@ -110,7 +112,7 @@ namespace MessageSense.ClientNet
                         new AsyncCallback(ReceiveCallback), state);
                 } else {
 
-                    if (state.sb.Length > 1)
+                    if (state.sb.Length > 1 || state.sb.ToString().Contains("| <EOF>"))
                     {
                         response = state.sb.ToString();
                     }
@@ -123,6 +125,7 @@ namespace MessageSense.ClientNet
             }
             catch (Exception e)
             {
+                Console.WriteLine("Exception Location => Connector.cs => AsynchronousClient.ReceiveCallback");
                 Console.WriteLine(e.ToString());
             }
         }
@@ -149,6 +152,7 @@ namespace MessageSense.ClientNet
             }
             catch (Exception e)
             {
+                Console.WriteLine("Exception Location => Connector.cs => AsynchronousClient.SendCallback");
                 Console.WriteLine(e.ToString());
             }
         }

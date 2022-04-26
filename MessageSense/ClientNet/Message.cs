@@ -26,29 +26,39 @@ namespace MessageSense.ClientNet
             return data;
         }
 
-        public static async Task SendStoreMessageRequest(this Message msg, AppUser user) {
-            var packet = PacketUtils.GeneratePacket();
-            await packet.GenerateMessageStoreRequest(msg, user);
-            var resp = await packet.TransmitPacketAsync();
-            if (resp.Split(NetControlChars.PrimarySeperator.Value)[0] == "Cmd.0000" && resp.Split(NetControlChars.PrimarySeperator.Value)[1] == msg.Id.ToString()) {
-                return;
+        public static async Task SendStoreMessageRequest(this Message msg, AppManager app) {
+            Console.WriteLine("Attempting SendStoreMessageRequest");
+            try {
+                var packet = PacketUtils.GeneratePacket();
+                await packet.GenerateMessageStoreRequest(msg);
+                var t_id = await app.PacketHandler.QueuePacketForTransmission(packet);
+                var respPacket = await app.PacketHandler.WaitForResponse(t_id);
+            } catch (Exception ex) {
+                Console.WriteLine("Exception Location => Message.cs => MessgaeUtils.SendStoreMessageRequest");
             }
+
         }
         public static async Task<int> SendPullMessageRequest(this Models.Contact contact, AppManager appManager)
         {
+            Console.WriteLine("Attempted SendPullMessageRequest");
             var packet = PacketUtils.GeneratePacket();
-            await packet.GenerateMessagePullRequest(contact, appManager.AppUser);
+            await packet.GenerateMessagePullRequest(contact);
 
             try
             {
-                var resp = await packet.TransmitPacketAsync();
-                if (resp.Split(NetControlChars.PrimarySeperator.Value)[0] == "Cmd.0004") return 0;
-                if (resp.Split(NetControlChars.PrimarySeperator.Value)[0] != "Cmd.0003") throw new Exception($"Unkown TaskCode => {resp.Split(NetControlChars.PrimarySeperator.Value)[0]}");
+                var t_id = await appManager.PacketHandler.QueuePacketForTransmission(packet);
+
+                var respPacket = await appManager.PacketHandler.WaitForResponse(t_id);
+                var respData = respPacket.Data;
+
+                if (respData.TaskCode != "Cmd.0003") throw new Exception("Error pulling Packet Response in SendPullMessageRequest => Message.cs => 40-50");
+
+
 
                 var msgList = new List<Message>();
                 var msgIdList = new List<int>();
 
-                var msgs = resp.Split(NetControlChars.PrimarySeperator.Value)[1];
+                var msgs = respData.Data.Split(NetControlChars.PrimarySeperator.Value)[1];
 
                 if (msgs.Contains(NetControlChars.DataObjSeperator.Value))
                 {
@@ -68,7 +78,7 @@ namespace MessageSense.ClientNet
 
 
                 // Send Messages Received Confirmation
-                await SendMessageReceivedConfirmation(msgIdList, appManager.AppUser);
+                await SendMessageReceivedConfirmation(msgIdList, appManager);
 
                 var data = new Data.MessageSenseData();
                 await data.Messages.AddRangeAsync(msgList);
@@ -82,14 +92,20 @@ namespace MessageSense.ClientNet
             return 0;
         }
 
-        private static async Task SendMessageReceivedConfirmation(List<int> msg_ids, AppUser user)
+        private static async Task SendMessageReceivedConfirmation(List<int> msg_ids, AppManager appManager)
         {
+            Console.WriteLine("Attempting SendMessageReceivedConfirmation");
             try
             {
                 var packet = PacketUtils.GeneratePacket();
-                await packet.GenerateMessageReceivedConfirmation(msg_ids, user);
-                var resp = await packet.TransmitPacketAsync();
-                if (resp == "OK")
+                await packet.GenerateMessageReceivedConfirmation(msg_ids);
+
+                var t_id = await appManager.PacketHandler.QueuePacketForTransmission(packet);
+                var respPacket = await appManager.PacketHandler.WaitForResponse(t_id);
+                var respData = respPacket.Data;
+                
+
+                if (respData.Data.Contains("OK"))
                 {
                     return;
                 }

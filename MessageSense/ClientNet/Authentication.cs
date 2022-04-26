@@ -43,10 +43,10 @@ namespace MessageSense.ClientNet
             return appUser;
         }
 
-        public static async Task<AppUser> NewUserNegotiation(string username, string firstname)
+        public static async Task<AppUser> NewUserNegotiation(string username, string firstname, AppManager appManager)
         {
             var packet = PacketUtils.GeneratePacket();
-            AppUser user; string resp;
+            AppUser user; Packet resp;
 
 
             while (true)
@@ -55,13 +55,14 @@ namespace MessageSense.ClientNet
 
                 packet.GenerateContactTokenRequest(user);
 
-                resp = await packet.TransmitPacketAsync();
+                var t_id = await appManager.PacketHandler.QueuePacketForTransmission(packet);
+                resp = await appManager.PacketHandler.WaitForResponse(t_id);
 
-                var resp_split = resp.Split(" | ");
+                var resp_split = resp.Data.Data.Split(" | ");
                 if (resp_split[0] != "Cmd.0002" || resp_split[1] == user.ContactToken || resp_split[2] == user.Username) break;
             }
-            user.CurrentAuthToken = resp.Split(" | ")[3];
-            user.Id = int.Parse(resp.Split(" | ")[4]);
+            user.CurrentAuthToken = resp.Data.Data.Split(" | ")[3];
+            user.Id = int.Parse(resp.Data.Data.Split(" | ")[4]);
 
             if (user.CurrentAuthToken == null || user.CurrentAuthToken.Length < 1) throw new Exception("Connection Error");
 

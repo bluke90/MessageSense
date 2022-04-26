@@ -21,7 +21,16 @@
 	Client Packet Structure:
 		" Task, EncryptionToken, Data={TaskObj} "
 
-
+		Packet:
+			TaskCode
+			PacketData: {
+				TransmissionId,
+				TaskCode,
+				Data,
+				AuthToken,
+				UserId
+			}
+			Packet Example | Sending => {"TransmissionId":264,"TaskCode":null,"Data":"0020202","AuthToken":"D90U39I56E26B37T2E79T8","AppUserId":1})
 
 
 	- Server Task Codes

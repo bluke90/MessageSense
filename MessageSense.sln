@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSense", "MessageSens
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSenseServer", "MessageSenseServer\MessageSenseServer.csproj", "{81388CAE-F7EA-4972-9C03-3073E6C5C0FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketTesting", "SocketTesting\SocketTesting.csproj", "{73A93420-8127-4CDF-8A45-0F8871AE01CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocketTesting", "SocketTesting\SocketTesting.csproj", "{73A93420-8127-4CDF-8A45-0F8871AE01CE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{B3E0F6B1-B407-4412-BA17-8F8001128563}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,5 +45,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61F7FB11-1E47-470C-91E2-47F8143E1572}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\Shared.projitems*{b3e0f6b1-b407-4412-ba17-8f8001128563}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

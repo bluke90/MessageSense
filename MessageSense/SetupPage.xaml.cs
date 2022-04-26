@@ -24,7 +24,7 @@ public partial class SetupPage : ContentPage
 		Preferences.Set("lastName", lastName);
 
 		try {
-			var appUser = await Authentication.NewUserNegotiation(username, firstName);
+			var appUser = await Authentication.NewUserNegotiation(username, firstName, _appManager);
 			var prefData = appUser.SerializeAppUserObj();
 
 			Preferences.Set("appUser", prefData);

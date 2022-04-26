@@ -12,14 +12,11 @@ namespace MessageSenseServer.Components.Net
     public class StateObject
     {
         // Size of receive buffer.  
-        public const int BufferSize = 1024;
-
+        public const int BufferSize = 256;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
-
         // Received data string.
         public StringBuilder sb = new StringBuilder();
-
         // Client socket.
         public Socket workSocket = null;
     }
@@ -33,38 +30,27 @@ namespace MessageSenseServer.Components.Net
         }
 
         public static void StartListening()
-        {
-            // Establish the local endpoint for the socket.  
-            // The DNS name of the computer  
-            // running the listener is "host.contoso.com".  
+        { 
             IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
             Console.WriteLine($"Using {ipAddress.ToString()}");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
-            // Create a TCP/IP socket.  
             Socket listener = new Socket(ipAddress.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);
-
-            // Bind the socket to the local endpoint and listen for incoming connections.  
-            try
-            {
+                        
+            try {       // Bind the socket to the local endpoint and listen for incoming connections.  
                 listener.Bind(localEndPoint);
                 listener.Listen(100);
 
-                while (true)
-                {
-                    // Set the event to nonsignaled state.  
+                while (true) {
                     allDone.Reset();
-
-                    // Start an asynchronous socket to listen for connections.  
                     Console.WriteLine("Waiting for a connection...");
-                    // Go to Accept call back on connection
+                    
                     listener.BeginAccept(
                         new AsyncCallback(AcceptCallback),
                         listener);
-
-                    // Wait until a connection is made before continuing.  
-                    allDone.WaitOne();
+                                       
+                    allDone.WaitOne();      // Wait until a connection is made before continuing.  
                 }
 
             }
@@ -73,21 +59,16 @@ namespace MessageSenseServer.Components.Net
                 Console.WriteLine(e.ToString());
             }
 
-            Console.WriteLine("\nPress ENTER to continue...");
-            Console.Read();
 
         }
 
         public static void AcceptCallback(IAsyncResult ar)
         {
-            // Signal the main thread to continue.  
             allDone.Set();
 
-            // Get the socket that handles the client request.  
             Socket listener = (Socket)ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
 
-            // Create the state object.  
             StateObject state = new StateObject();
             state.workSocket = handler;
             handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
@@ -98,42 +79,28 @@ namespace MessageSenseServer.Components.Net
         {
             String content = String.Empty;
 
-            // Retrieve the state object and the handler socket  
-            // from the asynchronous state object.  
             StateObject state = (StateObject)ar.AsyncState;
             Socket handler = state.workSocket;
 
-            // Read data from the client socket.
             int bytesRead = handler.EndReceive(ar);
 
-            if (bytesRead > 0)
-            {
-                // There  might be more data, so store the data received so far.  
+            if (bytesRead > 0) {
                 state.sb.Append(Encoding.ASCII.GetString(
                     state.buffer, 0, bytesRead));
 
-                // Check for end-of-file tag. If it is not there, read
-                // more data.  
                 content = state.sb.ToString();
-                if (content.IndexOf("<EOF>") > -1)
-                {
-                    // All the data has been read from the
-                    // client. Display it on the console.  
-                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                        content.Length, content);
+                if (content.IndexOf("<EOF>") > -1) {
+                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content);
 
                     // GeneratePacket
                     var packet = state.GeneratePacketFromStateObj();
                     // Handle Packet | Req, Resp, Msg
                     await packet.AnalyzeInboundPacket();
 
-
-                    // Echo the data back to the client.  
-                    Send(handler, packet.Resposne);
-                    Console.WriteLine("Sent: " + packet.Resposne);
-                }
-                else
-                {
+                    Send(handler, packet.Resposne + " | <EOF>");
+                    Console.WriteLine("Sent: " + packet.Resposne + " | <EOF>");
+                    Console.WriteLine("\n");
+                } else {
                     // Not all data received. Get more.  
                     handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                     new AsyncCallback(ReadCallback), state);
@@ -143,31 +110,23 @@ namespace MessageSenseServer.Components.Net
 
         private static void Send(Socket handler, String data)
         {
-            // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.ASCII.GetBytes(data);
 
-            // Begin sending the data to the remote device.  
             handler.BeginSend(byteData, 0, byteData.Length, 0,
                 new AsyncCallback(SendCallback), handler);
         }
 
         private static void SendCallback(IAsyncResult ar)
         {
-            try
-            {
-                // Retrieve the socket from the state object.  
+            try {
                 Socket handler = (Socket)ar.AsyncState;
 
-                // Complete sending the data to the remote device.  
                 int bytesSent = handler.EndSend(ar);
                 Console.WriteLine("Sent {0} bytes to client.", bytesSent);
 
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
-
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Console.WriteLine(e.ToString());
             }
         }

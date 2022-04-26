@@ -54,7 +54,7 @@ namespace MessageSenseServer.Components.Net
             var msgs = await context.Messages.Where(m => m.SenderToken == token && m.RecipientToken == appUser.ContactToken).ToListAsync();
 
             if (msgs.Count() < 1) {
-                packet.Resposne = "Cmd.0004 |  ";
+                packet.Resposne = "Cmd.0004";
                 return;
             }
 
