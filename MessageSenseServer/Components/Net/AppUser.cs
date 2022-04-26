@@ -34,7 +34,7 @@ namespace MessageSenseServer.Components.Net
 
         public static async Task<AppUser> GetAppUser(this Packet packet)
         {
-            var userId = packet.Data.Split(" -- ")[2];
+            var userId = packet.Data.AppUserId;
 
             ServerContext context = new ServerContext();
             var user = await context.Users.FirstOrDefaultAsync(m => m.Id == Convert.ToInt32(userId));

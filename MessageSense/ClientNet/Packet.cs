@@ -91,6 +91,7 @@ namespace MessageSense.ClientNet
         {
             Console.WriteLine($"Transmiting Packet Data with TransmissionId => {packet.Data.TransmissionId}");
             Packet respPacket = null;
+            packet.Data.TaskCode = packet.TaskCode.Value;
             try {
                 packet.Data.AuthToken = user.CurrentAuthToken;
                 packet.Data.AppUserId = user.Id;
@@ -138,10 +139,9 @@ namespace MessageSense.ClientNet
             packet.TaskCode = TaskCodes.MessagesPullReceived;
             return;
         }
-        public static async Task GenerateMessagePullRequest(this Packet packet, Models.Contact contact)
+        public static async Task GenerateMessagePullRequest(this Packet packet)
         {
             await Task.Yield();
-            packet.Data.Data = contact.Token;
             packet.TaskCode = TaskCodes.MessagePullRequest;
             return;
         }

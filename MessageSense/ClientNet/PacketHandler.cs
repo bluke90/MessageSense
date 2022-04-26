@@ -8,58 +8,55 @@ namespace MessageSense.ClientNet
 {
     public class PacketHandler
     {
-        public Queue<Packet> PacketQueue { get; set; }
-        public List<Packet> PacketRespList { get; set; }
         private Data.MessageSenseData MessageSenseData { get; set; }
-
+        private int _currentTransmissionId { get; set; }
         private Thread ClientServerThread { get; set; }
 
-        private ManualResetEvent waitingForResponse = new ManualResetEvent(false);
+        private ManualResetEvent NonReccuringTransmissionActive = new ManualResetEvent(true);
+        private ManualResetEvent UpdateInProgress = new ManualResetEvent(true);
 
-        public PacketHandler(AppUser user) {
-            PacketQueue = new Queue<Packet>();
-            PacketRespList = new List<Packet>(); 
+        private readonly AppUser _appUser;
+        private AppManager _appManager;
 
-            ClientServerThread = new Thread(() => ClientServerLoop(user));
-            ClientServerThread.Start();
+        public PacketHandler(AppManager manager) {
+
+            _appManager = manager;
+            _appUser = manager.AppUser;
+            
+            // ClientServerThread = new Thread(() => ClientServerLoop());
+            // ClientServerThread.Start();
         }
 
-        public async Task<Packet> WaitForResponse(int transmissionId) {
-            Console.WriteLine($"Waiting for respone to transmissionId => {transmissionId}");
-            await Task.Yield();
-            waitingForResponse.Reset();
+        public async Task<Packet> SendAsync(Packet packet) {
+            NonReccuringTransmissionActive.Reset();
+            UpdateInProgress.WaitOne();
+            var resp = await packet.TransmitPacketAsync(_appUser);
+            
+            NonReccuringTransmissionActive.Set();
+            return resp;
+
+        }
+
+
+        // (UpdateThread)thread => Handle Recurring transmissions (example: request for new messages)
+        private async void UpdateThread() {
             while (true) {
-                foreach (Packet packet in PacketRespList) {
-                    if (packet.Data.TransmissionId == transmissionId) {
-                        waitingForResponse.Set();
-                        PacketRespList.Remove(packet);
-                        return packet;
-                    }
-                }
-                await Task.Delay(50);
+                Thread.Sleep(4000);
+                // Stop if non reuccuring transmission active
+                NonReccuringTransmissionActive.WaitOne();
+                // Block until finished
+                UpdateInProgress.Set();
+                // What we need to update
+                // New messages - If non, move on
+                Console.WriteLine("Checking for new messages....");
+                var count = await _appManager.SendPullMessageRequest();
+                if (count < 1) Console.WriteLine("No new Messages");
+                
+                UpdateInProgress.Reset();
             }
         }
 
-        public async Task<int> QueuePacketForTransmission(Packet packet) {
-            await Task.Yield();
-            var id = packet.Data.TransmissionId;
-            PacketQueue.Enqueue(packet);
-            return id;
-        }
-
-        private async void ClientServerLoop(AppUser user) {
-            while (true) {
-                if (PacketQueue.Count > 0) {
-                    var packet = PacketQueue.Dequeue();
-
-                    var resp = await packet.TransmitPacketAsync(user);
-
-                    PacketRespList.Add(resp);
-                }
-                Thread.Sleep(1000);
-            }
 
 
-        }
     }
 }

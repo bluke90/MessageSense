@@ -31,29 +31,28 @@ namespace MessageSense.ClientNet
             try {
                 var packet = PacketUtils.GeneratePacket();
                 await packet.GenerateMessageStoreRequest(msg);
-                var t_id = await app.PacketHandler.QueuePacketForTransmission(packet);
-                var respPacket = await app.PacketHandler.WaitForResponse(t_id);
+                var respPacket = await app.PacketHandler.SendAsync(packet);
+                if (respPacket.Data.Data != "OK") throw new Exception("Unkown resposne for StoreMessageRequest");
             } catch (Exception ex) {
                 Console.WriteLine("Exception Location => Message.cs => MessgaeUtils.SendStoreMessageRequest");
+                Console.WriteLine(ex.ToString());
             }
 
         }
-        public static async Task<int> SendPullMessageRequest(this Models.Contact contact, AppManager appManager)
+        public static async Task<int> SendPullMessageRequest(this AppManager appManager)
         {
             Console.WriteLine("Attempted SendPullMessageRequest");
             var packet = PacketUtils.GeneratePacket();
-            await packet.GenerateMessagePullRequest(contact);
+
+            await packet.GenerateMessagePullRequest();
 
             try
             {
-                var t_id = await appManager.PacketHandler.QueuePacketForTransmission(packet);
-
-                var respPacket = await appManager.PacketHandler.WaitForResponse(t_id);
+                var respPacket = await appManager.PacketHandler.SendAsync(packet);
                 var respData = respPacket.Data;
 
+                if (respData.TaskCode == "Cmd.0004") { return 0; }
                 if (respData.TaskCode != "Cmd.0003") throw new Exception("Error pulling Packet Response in SendPullMessageRequest => Message.cs => 40-50");
-
-
 
                 var msgList = new List<Message>();
                 var msgIdList = new List<int>();
@@ -100,8 +99,7 @@ namespace MessageSense.ClientNet
                 var packet = PacketUtils.GeneratePacket();
                 await packet.GenerateMessageReceivedConfirmation(msg_ids);
 
-                var t_id = await appManager.PacketHandler.QueuePacketForTransmission(packet);
-                var respPacket = await appManager.PacketHandler.WaitForResponse(t_id);
+                var respPacket = await appManager.PacketHandler.SendAsync(packet);
                 var respData = respPacket.Data;
                 
 

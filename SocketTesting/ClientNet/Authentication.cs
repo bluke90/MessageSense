@@ -42,6 +42,7 @@ namespace SocketTesting.ClientNet
             return appUser;
         }
 
+        /*
         public static async Task<AppUser> NewUserNegotiation(string username, string firstname)
         {
             var packet = PacketUtils.GeneratePacket();
@@ -66,6 +67,6 @@ namespace SocketTesting.ClientNet
 
             return user;
         }
-
+        */
     }
 }

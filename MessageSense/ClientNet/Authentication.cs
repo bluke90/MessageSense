@@ -55,8 +55,7 @@ namespace MessageSense.ClientNet
 
                 packet.GenerateContactTokenRequest(user);
 
-                var t_id = await appManager.PacketHandler.QueuePacketForTransmission(packet);
-                resp = await appManager.PacketHandler.WaitForResponse(t_id);
+                resp = await appManager.PacketHandler.SendAsync(packet);
 
                 var resp_split = resp.Data.Data.Split(" | ");
                 if (resp_split[0] != "Cmd.0002" || resp_split[1] == user.ContactToken || resp_split[2] == user.Username) break;

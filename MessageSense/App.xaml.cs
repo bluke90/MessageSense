@@ -21,8 +21,7 @@ public partial class App : Application
 
 		if (user == null || fName == null || lName == null || appUser == null) {
 			MainPage = new SetupPage(_appManager);
-		} else
-        {
+		} else {
 			MainPage = new MainPage(_appManager);
 		}
 	}

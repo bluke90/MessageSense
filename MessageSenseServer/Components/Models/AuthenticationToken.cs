@@ -42,11 +42,8 @@ namespace MessageSenseServer.Components.Models
 
         public static async Task<bool> SimpleAuthenticatePacket(this Packet packet)
         {
-            var splitdata = packet.Data.Split(" -- ");
-            packet.Data = splitdata[0];
-            var authToken = splitdata[1];
-            var userId_str = splitdata[2];
-            var userId = Convert.ToInt32(splitdata[2]);
+            var authToken = packet.Data.AuthToken;
+            var userId = packet.Data.AppUserId;
 
             ServerContext context = new ServerContext();
             var appUserObj = await context.Users.FirstOrDefaultAsync(m => m.Id == userId);
@@ -62,7 +59,7 @@ namespace MessageSenseServer.Components.Models
             return false;
         }
 
-
+        
         public static void AuthenticateUser(string data)
         {
             var authToken = data.Split(" | ")[0];

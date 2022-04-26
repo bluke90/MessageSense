@@ -95,10 +95,10 @@ namespace MessageSenseServer.Components.Net
                     // GeneratePacket
                     var packet = state.GeneratePacketFromStateObj();
                     // Handle Packet | Req, Resp, Msg
-                    await packet.AnalyzeInboundPacket();
+                    var resp = await packet.AnalyzeInboundPacket();
 
-                    Send(handler, packet.Resposne + " | <EOF>");
-                    Console.WriteLine("Sent: " + packet.Resposne + " | <EOF>");
+                    Send(handler, resp + " | <EOF>");
+                    Console.WriteLine("Sent: " + resp + " | <EOF>");
                     Console.WriteLine("\n");
                 } else {
                     // Not all data received. Get more.  

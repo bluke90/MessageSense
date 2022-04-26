@@ -14,6 +14,28 @@ using SocketTesting;
 
 // Send Message
 
+ManualResetEvent reset1 = new ManualResetEvent(true);
 
+dosomething2();
+dosomething1();
+
+Console.ReadLine();
+
+
+void dosomething1() {
+    reset1.WaitOne();
+    Console.WriteLine("task1");
+}
+
+void dosomething2() {
+    reset1.Reset();
+    Console.WriteLine("task2");
+    
+}
+
+void dosomething3() {
+
+    Console.WriteLine("task1");
+}
 
 

@@ -7,16 +7,11 @@ public partial class MainPage : ContentPage
 
 	public MainPage(AppManager appManager)
 	{
-		InitializeComponent();
 		_appManager = appManager;
-		InitAppManagerServices();
+		InitializeComponent();
 		CheckPermissions();
 		CountNewMessages();
 	}
-
-	private async void InitAppManagerServices() {
-		await _appManager.InitPacketHandler();
-    }
 
 	private void CountNewMessages()
 	{

@@ -15,7 +15,8 @@ namespace MessageSenseServer.Components.Net
     {
         public static void PacketException(this Packet packet, PacketExceptionCode exception)
         {
-            packet.Resposne = $"Exception.{exception}";
+            packet.Data.TaskCode = "Exception";
+            packet.Data.Data = $"{exception}";
             return;
         }
 
@@ -31,14 +32,15 @@ namespace MessageSenseServer.Components.Net
             var authenticated = await packet.SimpleAuthenticatePacket();
             if (!authenticated) packet.PacketException(PacketExceptionCode.AuthenticationError);
 
-            var msg = JsonSerializer.Deserialize<Message>(packet.Data);
+            var msg = JsonSerializer.Deserialize<Message>(packet.Data.Data);
             var ClientMsgId = msg.Id;
             ServerContext context = new ServerContext();
             msg.Id = 0;
             context.Messages.Add(msg);
             await context.SaveChangesAsync();
 
-            packet.Resposne = $"Cmd.0000 | {ClientMsgId}";
+            packet.Data.TaskCode = "Cmd.0000";
+            packet.Data.Data = ClientMsgId.ToString();
             return;
         }
 
@@ -48,25 +50,24 @@ namespace MessageSenseServer.Components.Net
             var authenticated = await packet.SimpleAuthenticatePacket();
             if (!authenticated) packet.PacketException(PacketExceptionCode.AuthenticationError);
 
-            var token = packet.Data;
+            var token = packet.Data.Data;
 
             ServerContext context = new ServerContext();
             var msgs = await context.Messages.Where(m => m.SenderToken == token && m.RecipientToken == appUser.ContactToken).ToListAsync();
 
             if (msgs.Count() < 1) {
-                packet.Resposne = "Cmd.0004";
+                packet.Data.TaskCode = "Cmd.0004";
                 return;
             }
 
-            var respCode = "Cmd.0003";
+            packet.Data.TaskCode = "Cmd.0003";
             var respMsgs = string.Empty;
 
-            for (int i = 0; i < msgs.Count; i++)
-            {
+            for (int i = 0; i < msgs.Count; i++) {
                 respMsgs += JsonSerializer.Serialize(msgs[i]);
                 if (i != msgs.Count - 1) respMsgs += " <|> ";
             }
-            packet.Resposne = respCode + " | " + respMsgs;
+            packet.Data.Data = respMsgs;
             return;
         }
 
@@ -75,7 +76,7 @@ namespace MessageSenseServer.Components.Net
             var authenticated = await packet.SimpleAuthenticatePacket();
             if (!authenticated) packet.PacketException(PacketExceptionCode.AuthenticationError);
 
-            var msg_ids = packet.Data;
+            var msg_ids = packet.Data.Data;
             var idArray = msg_ids.Split(" <|> ");
 
             ServerContext context = new ServerContext();
@@ -90,15 +91,15 @@ namespace MessageSenseServer.Components.Net
                 }
             }
             await context.SaveChangesAsync();
-            packet.Resposne = "OK";
+            packet.Data.Data = "OK";
             return;
         }
 
 
         public static async Task ProcessContactTokenRequest(this Packet packet)
         {
-            var userData = packet.Data.Split(" -- ")[0];
-            var deviceId = packet.Data.Split(" -- ")[1];
+            var userData = packet.Data.Data.Split(" -- ")[0];
+            var deviceId = packet.Data.Data.Split(" -- ")[1];
 
             var user = AppUserExtensions.DeserializeAppUserObj(userData);
             
@@ -126,8 +127,9 @@ namespace MessageSenseServer.Components.Net
             await context.SaveChangesAsync();
 
             // Set response
-            var respString = $"Cmd.0002 | {user.ContactToken} | {user.Username} | {user.CurrentAuthToken} | {user.Id}";
-            packet.Resposne = respString;
+            var respString = $"{user.ContactToken} | {user.Username} | {user.CurrentAuthToken} | {user.Id}";
+            packet.Data.TaskCode = "Cmd.0002";
+            packet.Data.Data = respString;
             return;
         }
 
