@@ -40,7 +40,7 @@ namespace MessageSense.ClientNet
         public static string StartClient(string data)
         { 
             try {  
-                IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
+                IPAddress ipAddress = IPAddress.Parse("192.168.1.12");
                 Console.WriteLine(ipAddress.ToString());
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
  
@@ -118,7 +118,6 @@ namespace MessageSense.ClientNet
                     }
 
                     receiveDone.Set();  
-                    client.
                     client.Shutdown(SocketShutdown.Both);
                     client.Close();
                     client = null;

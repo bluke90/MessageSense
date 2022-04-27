@@ -48,7 +48,7 @@ namespace MessageSense.ClientNet
 
             try
             {
-                var respPacket = await appManager.PacketHandler.SendUpdatePacketAsync(packet);
+                var respPacket = await appManager.PacketHandler.SendAsync(packet);
                 var respData = respPacket.Data;
 
                 if (respData.TaskCode == "Cmd.0004") { return 0; }

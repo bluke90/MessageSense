@@ -10,7 +10,7 @@ public partial class App : Application
 
 	public App()
 	{
-		_appManager = new AppManager();
+		
 
 		InitializeComponent();
 
@@ -22,6 +22,7 @@ public partial class App : Application
 		if (user == null || fName == null || lName == null || appUser == null) {
 			MainPage = new SetupPage(_appManager);
 		} else {
+			_appManager = new AppManager();
 			MainPage = new MainPage(_appManager);
 		}
 	}

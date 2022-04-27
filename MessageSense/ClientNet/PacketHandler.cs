@@ -8,6 +8,7 @@ namespace MessageSense.ClientNet
 {
     public class PacketHandler
     {
+        private List<Packet> _packetRespList { get; set; }
         private Data.MessageSenseData MessageSenseData { get; set; }
         private int _currentTransmissionId { get; set; }
         private Thread _updateThread { get; set; }
@@ -22,30 +23,43 @@ namespace MessageSense.ClientNet
 
             _appManager = manager;
             _appUser = manager.AppUser;
+            _packetRespList = new List<Packet>();
             _updateThread = new Thread(UpdateThread);
             _updateThread.Start();
         }
 
         public async Task<Packet> SendAsync(Packet packet) {
-            NonReccuringTransmissionActive.Reset();
-            UpdateInProgress.WaitOne();
-
-            var resp = await packet.TransmitPacketAsync(_appUser);
             
-            NonReccuringTransmissionActive.Set();
-            return resp;
+            UpdateInProgress.WaitOne();
+            var tId = packet.Data.TransmissionId;
 
+            var resp = await packet.TransmitPacket(_appUser);
+            _packetRespList.Add(resp);
+
+            resp = await GetOrWaitResponse(tId);
+
+
+
+            return resp;
         }
 
-        public async Task<Packet> SendUpdatePacketAsync(Packet packet) {
-            UpdateInProgress.Reset();
-            NonReccuringTransmissionActive.WaitOne();
-
-            var resp = await packet.TransmitPacketAsync(_appUser);
-
-            UpdateInProgress.Set();
-            return resp;
-
+        private Task<Packet> GetOrWaitResponse(int t_id)
+        {
+            int attempts = 0;
+            while (true)
+            {
+                attempts += 1;
+                foreach (var response in _packetRespList)
+                {
+                    if (response.Data.TransmissionId == t_id)
+                    {
+                        _packetRespList.Remove(response);
+                        return Task.FromResult(response);
+                    }
+                    if (attempts > 50) return Task.FromResult(response);
+                }
+                Thread.Sleep(100);
+            }
         }
 
         // (UpdateThread)thread => Handle Recurring transmissions (example: request for new messages)

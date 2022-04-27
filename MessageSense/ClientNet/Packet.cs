@@ -87,7 +87,7 @@ namespace MessageSense.ClientNet
             return packet;
         }
 
-        public static Packet TransmitPacket(this Packet packet, AppUser user)
+        public static Task<Packet> TransmitPacket(this Packet packet, AppUser user)
         {
             Console.WriteLine($"Transmiting Packet Data with TransmissionId => {packet.Data.TransmissionId}");
             Packet respPacket = null;
@@ -105,20 +105,15 @@ namespace MessageSense.ClientNet
                 respPacket = new Packet() { Data = respPacketData };
                 Console.WriteLine("Received: " + array[0]);
 
-                return respPacket;
+                return Task.FromResult(respPacket);
             } catch (Exception ex) {
                 Console.WriteLine("Exception Location => Packet.cs => PacketUtils.TransmitPacket");
                 Console.WriteLine(ex.ToString());
             }
-            return respPacket;
+            return Task.FromResult(respPacket);
         }
 
-        public static async Task<Packet> TransmitPacketAsync(this Packet packet, AppUser appUser)
-        {
-            await Task.Yield();
-            var resp = packet.TransmitPacket(appUser);
-            return resp;
-        }
+        public static Task<Packet> Transmit
 
         // TaskObjects
         public static async Task GenerateMessageStoreRequest(this Packet packet, Message msg)
