@@ -13,8 +13,7 @@ namespace MessageSense.ClientNet
         private int _currentTransmissionId { get; set; }
         private Thread _updateThread { get; set; }
 
-        private ManualResetEvent NonReccuringTransmissionActive = new ManualResetEvent(true);
-        private ManualResetEvent UpdateInProgress = new ManualResetEvent(false);
+        private ManualResetEvent isSending = new ManualResetEvent(true);
 
         private readonly AppUser _appUser;
         private AppManager _appManager;
@@ -30,15 +29,12 @@ namespace MessageSense.ClientNet
 
         public async Task<Packet> SendAsync(Packet packet) {
             
-            UpdateInProgress.WaitOne();
             var tId = packet.Data.TransmissionId;
 
             var resp = await packet.TransmitPacket(_appUser);
             _packetRespList.Add(resp);
 
             resp = await GetOrWaitResponse(tId);
-
-
 
             return resp;
         }

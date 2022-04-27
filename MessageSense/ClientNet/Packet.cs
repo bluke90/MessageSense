@@ -113,7 +113,25 @@ namespace MessageSense.ClientNet
             return Task.FromResult(respPacket);
         }
 
-        public static Task<Packet> Transmit
+        public static Task<Packet> TransmitUnauthenticatedPacket(this Packet packet) {
+            Packet respPacket = null;
+            packet.Data.TaskCode = packet.TaskCode.Value;
+            try {
+                var packetData = JsonSerializer.Serialize(packet.Data);
+
+                var resp_data = AsynchronousClient.StartClient(packetData);
+
+                var array = resp_data.Split(NetControlChars.PrimarySeperator.Value);
+                var respPacketData = JsonSerializer.Deserialize<PacketData>(array[0]);
+                respPacket = new Packet() { Data = respPacketData };
+                Console.WriteLine("Received: " + array[0]);
+
+                return Task.FromResult<Packet>(respPacket);
+            } catch (Exception ex) {
+                Console.WriteLine(ex.ToString());
+            }
+            return Task.FromResult(respPacket);
+        }
 
         // TaskObjects
         public static async Task GenerateMessageStoreRequest(this Packet packet, Message msg)
