@@ -127,7 +127,7 @@ namespace MessageSenseServer.Components.Net
             await context.SaveChangesAsync();
 
             // Set response
-            var respString = $"{user.ContactToken} | {user.Username} | {user.CurrentAuthToken} | {user.Id}";
+            var respString = $"{user.ContactToken} -- {user.Username} -- {user.CurrentAuthToken} -- {user.Id}";
             packet.Data.TaskCode = "Cmd.0002";
             packet.Data.Data = respString;
             return;

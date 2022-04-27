@@ -58,10 +58,10 @@ namespace MessageSense.ClientNet
                 resp = await appManager.PacketHandler.SendAsync(packet);
 
                 var resp_split = resp.Data.Data.Split(" | ");
-                if (resp_split[0] != "Cmd.0002" || resp_split[1] == user.ContactToken || resp_split[2] == user.Username) break;
+                if (resp.Data.TaskCode == "Cmd.0002" && resp_split[0] == user.ContactToken && resp_split[1] == user.Username) break;
             }
-            user.CurrentAuthToken = resp.Data.Data.Split(" | ")[3];
-            user.Id = int.Parse(resp.Data.Data.Split(" | ")[4]);
+            user.CurrentAuthToken = resp.Data.Data.Split(" | ")[2];
+            user.Id = int.Parse(resp.Data.Data.Split(" | ")[3]);
 
             if (user.CurrentAuthToken == null || user.CurrentAuthToken.Length < 1) throw new Exception("Connection Error");
 
