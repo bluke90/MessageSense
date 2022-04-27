@@ -28,14 +28,14 @@ namespace MessageSense.ClientNet
         }
 
         public async Task<Packet> SendAsync(Packet packet) {
-            
+            isSending.Reset();
             var tId = packet.Data.TransmissionId;
 
             var resp = await packet.TransmitPacket(_appUser);
             _packetRespList.Add(resp);
 
             resp = await GetOrWaitResponse(tId);
-
+            isSending.Set();
             return resp;
         }
 
@@ -59,14 +59,15 @@ namespace MessageSense.ClientNet
         }
 
         // (UpdateThread)thread => Handle Recurring transmissions (example: request for new messages)
-        private async void UpdateThread() {
+        private void UpdateThread() {
             while (true) {
-                Thread.Sleep(4000);
+                Thread.Sleep(10000);
                 // What we need to update
                 // New messages - If non, move on
                 Console.WriteLine("Checking for new messages....");
-                var count = await _appManager.SendPullMessageRequest();
-                if (count < 1) Console.WriteLine("No new Messages");
+                var task = _appManager.SendPullMessageRequest();
+                task.Wait();
+                isSending.WaitOne();
             }
         }
 

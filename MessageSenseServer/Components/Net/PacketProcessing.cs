@@ -53,7 +53,7 @@ namespace MessageSenseServer.Components.Net
             var token = packet.Data.Data;
 
             ServerContext context = new ServerContext();
-            var msgs = await context.Messages.Where(m => m.SenderToken == token && m.RecipientToken == appUser.ContactToken).ToListAsync();
+            var msgs = await context.Messages.Where(m => m.RecipientToken == appUser.ContactToken).ToListAsync();
 
             if (msgs.Count() < 1) {
                 packet.Data.TaskCode = "Cmd.0004";

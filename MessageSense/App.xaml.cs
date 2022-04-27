@@ -6,12 +6,10 @@ namespace MessageSense;
 public partial class App : Application
 {
 
-	private AppManager _appManager;
+	private AppManager _appManager = null;
 
 	public App()
 	{
-		
-
 		InitializeComponent();
 
 		var user = Preferences.Get("username", null);

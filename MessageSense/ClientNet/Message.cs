@@ -57,7 +57,7 @@ namespace MessageSense.ClientNet
                 var msgList = new List<Message>();
                 var msgIdList = new List<int>();
 
-                var msgs = respData.Data.Split(NetControlChars.PrimarySeperator.Value)[1];
+                var msgs = respData.Data;
 
                 if (msgs.Contains(NetControlChars.DataObjSeperator.Value))
                 {

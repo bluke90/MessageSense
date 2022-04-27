@@ -104,12 +104,14 @@ namespace MessageSenseServer.Components.Net
             await Task.Yield();
             switch (code)
             {
-                case "0000":        // Messages Received
-                    await packet.ProcessMessagesReceivedReqeust();
+                case "0000": 
                     break;
                 case "0001":        // New Auth Token Received
                     break;
                 case "0002":        // Contact Token Received
+                    break;
+                case "0003":    // Messages Received
+                    await packet.ProcessMessagesReceivedReqeust();
                     break;
             }
             return;
