@@ -29,12 +29,25 @@ namespace MessageSense.ClientNet
 
         public async Task<Packet> SendAsync(Packet packet) {
             isSending.Reset();
+            Console.WriteLine($"Sending => T_ID: {packet.Data.TransmissionId}");
             var tId = packet.Data.TransmissionId;
 
             var resp = await packet.TransmitPacket(_appUser);
             _packetRespList.Add(resp);
-
+            Console.WriteLine($"Searching for response => T_ID: {packet.Data.TransmissionId}");
             resp = await GetOrWaitResponse(tId);
+            Console.WriteLine($"Retreived response => T_ID: {packet.Data.TransmissionId}");
+            isSending.Set();
+            return resp;
+        }
+
+        public async Task<Packet> SendUnauthenticatedAsync(Packet packet, AppUser appUser)
+        {
+            isSending.Reset();
+            var tId = packet.Data.TransmissionId;
+
+            var resp = await packet.TransmitPacket(appUser, authenticate: false);
+
             isSending.Set();
             return resp;
         }
@@ -54,7 +67,7 @@ namespace MessageSense.ClientNet
                     }
                     if (attempts > 50) return Task.FromResult(response);
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(250);
             }
         }
 

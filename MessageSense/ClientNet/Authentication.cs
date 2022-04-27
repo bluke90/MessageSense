@@ -51,17 +51,23 @@ namespace MessageSense.ClientNet
 
             while (true)
             {
-                user = GenerateAppUser("bluke", "blake");
+                user = GenerateAppUser(username, firstname);
 
                 packet.GenerateContactTokenRequest(user);
+                try
+                {
+                    resp = await appManager.PacketHandler.SendUnauthenticatedAsync(packet, user);
 
-                resp = await appManager.PacketHandler.SendAsync(packet);
-
-                var resp_split = resp.Data.Data.Split(" | ");
-                if (resp.Data.TaskCode == "Cmd.0002" && resp_split[0] == user.ContactToken && resp_split[1] == user.Username) break;
+                    var resp_split = resp.Data.Data.Split(" -- ");
+                    if (resp.Data.TaskCode == "Cmd.0002" && resp_split[0] == user.ContactToken && resp_split[1] == user.Username) break;
+                }catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    Console.WriteLine("Error in New User Negotiation");
+                }
             }
-            user.CurrentAuthToken = resp.Data.Data.Split(" | ")[2];
-            user.Id = int.Parse(resp.Data.Data.Split(" | ")[3]);
+            user.CurrentAuthToken = resp.Data.Data.Split(" -- ")[2];
+            user.Id = int.Parse(resp.Data.Data.Split(" -- ")[3]);
 
             if (user.CurrentAuthToken == null || user.CurrentAuthToken.Length < 1) throw new Exception("Connection Error");
 

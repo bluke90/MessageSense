@@ -87,13 +87,13 @@ namespace MessageSense.ClientNet
             return packet;
         }
 
-        public static Task<Packet> TransmitPacket(this Packet packet, AppUser user)
+        public static Task<Packet> TransmitPacket(this Packet packet, AppUser user, bool authenticate = true)
         {
             Console.WriteLine($"Transmiting Packet Data with TransmissionId => {packet.Data.TransmissionId}");
             Packet respPacket = null;
             packet.Data.TaskCode = packet.TaskCode.Value;
             try {
-                packet.Data.AuthToken = user.CurrentAuthToken;
+                if (authenticate) packet.Data.AuthToken = user.CurrentAuthToken;
                 packet.Data.AppUserId = user.Id;
 
                 var packetData = JsonSerializer.Serialize(packet.Data);
