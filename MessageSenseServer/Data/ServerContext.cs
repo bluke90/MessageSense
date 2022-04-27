@@ -28,6 +28,9 @@ namespace MessageSenseServer.Data
         {
             string dbPath = Path.Combine(Environment.CurrentDirectory, "ServerContext.db3");
 
+            // Desktop => "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MessageSense;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+            // Laptop => 
+
             optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MessageSense;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
         }
     }

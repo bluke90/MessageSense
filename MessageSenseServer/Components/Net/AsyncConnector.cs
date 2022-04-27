@@ -25,15 +25,13 @@ namespace MessageSenseServer.Components.Net
         // Thread signal.  
         public static ManualResetEvent allDone = new ManualResetEvent(false);
 
-        public AsyncConnector()
-        {
-        }
+        public AsyncConnector(){}
 
-        public static void StartListening()
+        public static void StartListening(string host_ip = "127.0.0.1", int port = 11000)
         { 
-            IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
+            IPAddress ipAddress = IPAddress.Parse(host_ip);
             Console.WriteLine($"Using {ipAddress.ToString()}");
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
 
             Socket listener = new Socket(ipAddress.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);

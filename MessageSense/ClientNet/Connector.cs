@@ -118,6 +118,7 @@ namespace MessageSense.ClientNet
                     }
 
                     receiveDone.Set();  
+                    client.
                     client.Shutdown(SocketShutdown.Both);
                     client.Close();
                     client = null;

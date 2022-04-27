@@ -13,15 +13,20 @@ namespace MessageSenseServer
     public class ComponentManager
     {
     
-        private void BuildConfiguration()
-        {
-            IConfiguration config = new ConfigurationBuilder();
+        public IConfiguration Configuration { get; private set; }
+
+        public ComponentManager() {
+            BuildConfiguration();
         }
 
-    }
+        private void BuildConfiguration()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false);
 
-    static IHostBuilder CreateDefaultBuilder()
-    {
-        
+            Configuration = builder.Build();
+        }
+
     }
 }
