@@ -34,6 +34,7 @@ namespace MessageSense.ClientNet
             Console.WriteLine($"Sending => T_ID: {packet.Data.TransmissionId}");
             var tId = packet.Data.TransmissionId;
 
+
             var resp = await packet.TransmitPacket(_appUser);
             _packetRespList.Add(resp);
             Console.WriteLine($"Searching for response => T_ID: {packet.Data.TransmissionId}");

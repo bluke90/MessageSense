@@ -81,7 +81,7 @@ public partial class MessagePage : ContentPage
     }
 	
 
-	private async void OnSendMsg(object sender, EventArgs e)
+	private void OnSendMsg(object sender, EventArgs e)
     {
 		try
 		{
