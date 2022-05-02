@@ -1,44 +1,26 @@
-﻿namespace MessageSense;
+﻿using Microsoft.Maui;
+
+
+namespace MessageSense;
 
 public partial class App : Application
 {
 
-	private AppManager _appManager;
+	private AppManager _appManager = null;
 
-	public App()
-	{
-		_appManager = new AppManager();
-
+	public App() {
 		InitializeComponent();
 
-		// AddTestMessage();
+		var user = Preferences.Get("username", null);
+		var fName = Preferences.Get("firstName", null);
+		var lName = Preferences.Get("lastName", null);
+		var appUser = Preferences.Get("appUser", null);
 
-		var user = Microsoft.Maui.Essentials.Preferences.Get("username", null);
-		var fName = Microsoft.Maui.Essentials.Preferences.Get("firstName", null);
-		var lName = Microsoft.Maui.Essentials.Preferences.Get("lastName", null);
-
-		if (user == null || fName == null || lName == null)
-		{
+		if (user == null || fName == null || lName == null || appUser == null) {
 			MainPage = new SetupPage(_appManager);
-		} else
-        {
+		} else {
+			_appManager = new AppManager();
 			MainPage = new MainPage(_appManager);
 		}
 	}
-
-	private void AddTestMessage()
-    {
-		Models.Message message = new Models.Message()
-		{
-			DateTime = DateTime.Now,
-			RecipientToken = "0001",
-			Data = "It's going good! How about yourself??",
-			SenderToken = "18580206",
-			Read = false
-		};
-
-		_appManager.MessageSenseData.Messages.Add(message);
-		_appManager.MessageSenseData.SaveChanges();
-	}
-
 }
