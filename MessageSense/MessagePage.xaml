@@ -43,7 +43,7 @@
             VerticalOptions="CenterAndExpand"
             Margin="5"
             Clicked="OnGoBack"/>
-
+        
         <Frame
             Grid.Column="0"
             Grid.ColumnSpan="2"

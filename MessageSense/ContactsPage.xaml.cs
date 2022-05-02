@@ -46,6 +46,7 @@ public partial class ContactsPage : ContentPage
 			Padding = new Thickness(15),
 			VerticalOptions = LayoutOptions.FillAndExpand,
 			HorizontalOptions = LayoutOptions.FillAndExpand,
+			ImageSource = new FileImageSource { File = "account_circle.svg",  }
 		};
 		// button.Clicked += ContactButtonClicked;
 		button.Pressed += ContactButtonPressed;
