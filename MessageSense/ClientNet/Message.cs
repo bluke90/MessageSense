@@ -32,7 +32,7 @@ namespace MessageSense.ClientNet
                 var packet = PacketUtils.GeneratePacket();
                 await packet.GenerateMessageStoreRequest(msg);
                 var respPacket = await app.PacketHandler.SendAsync(packet);
-                if (respPacket.Data.Data != "OK") throw new Exception("Unkown resposne for StoreMessageRequest");
+                if (respPacket.Data.Data != msg.Id.ToString()) throw new Exception("Unkown resposne for StoreMessageRequest");
             } catch (Exception ex) {
                 Console.WriteLine("Exception Location => Message.cs => MessgaeUtils.SendStoreMessageRequest");
                 Console.WriteLine(ex.ToString());

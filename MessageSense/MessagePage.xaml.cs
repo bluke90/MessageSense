@@ -32,6 +32,7 @@ public partial class MessagePage : ContentPage
 		_refreshThread = new Thread(() => BackgroundRefreshThread());
 		_refreshThread.Start();
 		isSending = false;
+		ClearMessages(contact, _context);
 	}
 
 	private async void BackgroundRefreshThread()
@@ -98,7 +99,7 @@ public partial class MessagePage : ContentPage
 			_context.Messages.Add(msg);
 			_context.SaveChanges();
 
-			await msg.SendStoreMessageRequest(_appManager);
+			Task.Run(() => msg.SendStoreMessageRequest(_appManager));
 		}catch (Exception ex)
         {
 			Console.WriteLine("Exception Location Details: Method => OnSendMsg | File => MessagePage.Xaml.cs | Line => 84");

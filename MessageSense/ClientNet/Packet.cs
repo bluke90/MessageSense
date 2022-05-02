@@ -87,7 +87,7 @@ namespace MessageSense.ClientNet
             return packet;
         }
 
-        public static Task<Packet> TransmitPacket(this Packet packet, AppUser user, bool authenticate = true)
+        public static async Task<Packet> TransmitPacket(this Packet packet, AppUser user, bool authenticate = true)
         {
             Console.WriteLine($"Transmiting Packet Data with TransmissionId => {packet.Data.TransmissionId}");
             Packet respPacket = null;
@@ -98,39 +98,39 @@ namespace MessageSense.ClientNet
 
                 var packetData = JsonSerializer.Serialize(packet.Data);
 
-                var resp_data = AsynchronousClient.StartClient(packetData);
+                var resp_data = await AsynchronousClient.StartClient(packetData);
 
                 var array = resp_data.Split(NetControlChars.PrimarySeperator.Value);
                 var respPacketData = JsonSerializer.Deserialize<PacketData>(array[0]);
                 respPacket = new Packet() { Data = respPacketData };
                 Console.WriteLine("Received: " + array[0]);
 
-                return Task.FromResult(respPacket);
+                return respPacket;
             } catch (Exception ex) {
                 Console.WriteLine("Exception Location => Packet.cs => PacketUtils.TransmitPacket");
                 Console.WriteLine(ex.ToString());
             }
-            return Task.FromResult(respPacket);
+            return respPacket;
         }
 
-        public static Task<Packet> TransmitUnauthenticatedPacket(this Packet packet) {
+        public static async Task<Packet> TransmitUnauthenticatedPacket(this Packet packet) {
             Packet respPacket = null;
             packet.Data.TaskCode = packet.TaskCode.Value;
             try {
                 var packetData = JsonSerializer.Serialize(packet.Data);
 
-                var resp_data = AsynchronousClient.StartClient(packetData);
+                var resp_data = await AsynchronousClient.StartClient(packetData);
 
                 var array = resp_data.Split(NetControlChars.PrimarySeperator.Value);
                 var respPacketData = JsonSerializer.Deserialize<PacketData>(array[0]);
                 respPacket = new Packet() { Data = respPacketData };
                 Console.WriteLine("Received: " + array[0]);
 
-                return Task.FromResult<Packet>(respPacket);
+                return respPacket;
             } catch (Exception ex) {
                 Console.WriteLine(ex.ToString());
             }
-            return Task.FromResult(respPacket);
+            return respPacket;
         }
 
         // TaskObjects

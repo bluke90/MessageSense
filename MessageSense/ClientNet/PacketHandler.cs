@@ -8,6 +8,7 @@ namespace MessageSense.ClientNet
 {
     public class PacketHandler
     {
+        private Queue<Packet> packetQueue = new Queue<Packet>();
         private List<Packet> _packetRespList { get; set; }
         private Data.MessageSenseData MessageSenseData { get; set; }
         private int _currentTransmissionId { get; set; }
@@ -22,13 +23,14 @@ namespace MessageSense.ClientNet
 
             _appManager = manager;
             _appUser = manager.AppUser;
+            packetQueue = new Queue<Packet>();
             _packetRespList = new List<Packet>();
             _updateThread = new Thread(UpdateThread);
             _updateThread.Start();
         }
 
         public async Task<Packet> SendAsync(Packet packet) {
-            isSending.Reset();
+            // isSending.Reset();
             Console.WriteLine($"Sending => T_ID: {packet.Data.TransmissionId}");
             var tId = packet.Data.TransmissionId;
 
@@ -37,7 +39,7 @@ namespace MessageSense.ClientNet
             Console.WriteLine($"Searching for response => T_ID: {packet.Data.TransmissionId}");
             resp = await GetOrWaitResponse(tId);
             Console.WriteLine($"Retreived response => T_ID: {packet.Data.TransmissionId}");
-            isSending.Set();
+            // isSending.Set();
             return resp;
         }
 
@@ -65,22 +67,30 @@ namespace MessageSense.ClientNet
                         _packetRespList.Remove(response);
                         return Task.FromResult(response);
                     }
-                    if (attempts > 50) return Task.FromResult(response);
                 }
-                Thread.Sleep(250);
+                Thread.Sleep(50);
             }
         }
 
         // (UpdateThread)thread => Handle Recurring transmissions (example: request for new messages)
-        private void UpdateThread() {
+        private async void UpdateThread() {
             while (true) {
                 Thread.Sleep(10000);
+                while (packetQueue.Count > 0) { // Send queued packets
+                    var packet = packetQueue.Dequeue();
+                    var t_id = packet.Data.TransmissionId;
+                    var resp = await packet.TransmitPacket(_appUser);
+                    _packetRespList.Add(resp);
+                    resp = await GetOrWaitResponse(t_id);
+
+
+                }
                 // What we need to update
                 // New messages - If non, move on
                 Console.WriteLine("Checking for new messages....");
                 var task = _appManager.SendPullMessageRequest();
                 task.Wait();
-                isSending.WaitOne();
+                // isSending.WaitOne();
             }
         }
 

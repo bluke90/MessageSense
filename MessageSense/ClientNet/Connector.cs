@@ -37,10 +37,11 @@ namespace MessageSense.ClientNet
         // The response from the remote device.  
         private static String response = String.Empty;
 
-        public static string StartClient(string data)
-        { 
+        public static async Task<string> StartClient(string data)
+        {
+            await Task.Yield();
             try {  
-                IPAddress ipAddress = IPAddress.Parse("192.168.1.12");
+                IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
                 Console.WriteLine(ipAddress.ToString());
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
  
@@ -105,9 +106,9 @@ namespace MessageSense.ClientNet
                 StateObject state = (StateObject)ar.AsyncState;
                 Socket client = state.workSocket;
                 int bytesRead = client.EndReceive(ar);
-
+                var data = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
                 if (bytesRead > 0) {
-                    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+                    state.sb.Append(data);
                     client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                         new AsyncCallback(ReceiveCallback), state);
                 } else {
