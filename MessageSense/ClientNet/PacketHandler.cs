@@ -13,8 +13,9 @@ namespace MessageSense.ClientNet
         private Data.MessageSenseData MessageSenseData { get; set; }
         private int _currentTransmissionId { get; set; }
         private Thread _updateThread { get; set; }
+        private Thread _sendThread { get; set; }
 
-        private ManualResetEvent isSending = new ManualResetEvent(true);
+        // private ManualResetEvent isSending = new ManualResetEvent(true);
 
         private readonly AppUser _appUser;
         private AppManager _appManager;
@@ -25,39 +26,53 @@ namespace MessageSense.ClientNet
             _appUser = manager.AppUser;
             packetQueue = new Queue<Packet>();
             _packetRespList = new List<Packet>();
+            _sendThread = new Thread(SendThread);
+            _sendThread.Start();
             _updateThread = new Thread(UpdateThread);
             _updateThread.Start();
         }
 
-        public async Task<Packet> SendAsync(Packet packet) {
+        public void QueuePacket(Packet packet) {
             // isSending.Reset();
-            Console.WriteLine($"Sending => T_ID: {packet.Data.TransmissionId}");
+            Console.WriteLine($"Queuing => T_ID: {packet.Data.TransmissionId}");
             var tId = packet.Data.TransmissionId;
-
-
-            var resp = await packet.TransmitPacket(_appUser);
-            _packetRespList.Add(resp);
-            Console.WriteLine($"Searching for response => T_ID: {packet.Data.TransmissionId}");
-            resp = await GetOrWaitResponse(tId);
-            Console.WriteLine($"Retreived response => T_ID: {packet.Data.TransmissionId}");
+            packetQueue.Enqueue(packet);
+            // Console.WriteLine($"Searching for response => T_ID: {packet.Data.TransmissionId}");
+            // var resp = await GetOrWaitResponse(tId);
+            
             // isSending.Set();
-            return resp;
+            
+        }
+
+        public void Send() {
+            var packet = packetQueue.Dequeue();
+            var t_id = packet.Data.TransmissionId;
+            var packetData = packet.PreparePacketForTransmission(_appUser);
+            var resp = SynchronousClient.SendPacket(packetData);
+            var respPacket = PacketUtils.AnalyseResposnePacket(resp);
+            _packetRespList.Add(respPacket);
+        }
+
+        public Task<Packet> SendAsync() {
+            throw new NotImplementedException();
         }
 
         public async Task<Packet> SendUnauthenticatedAsync(Packet packet, AppUser appUser)
         {
-            isSending.Reset();
+            // isSending.Reset();
             var tId = packet.Data.TransmissionId;
 
             var resp = await packet.TransmitPacket(appUser, authenticate: false);
 
-            isSending.Set();
+            // isSending.Set();
             return resp;
         }
 
-        private Task<Packet> GetOrWaitResponse(int t_id)
+        public Packet GetOrWaitResponse(Packet packet)
         {
+            var t_id = packet.Data.TransmissionId;
             int attempts = 0;
+            Console.WriteLine($"Searching for response => T_ID: {t_id}");
             while (true)
             {
                 attempts += 1;
@@ -65,36 +80,39 @@ namespace MessageSense.ClientNet
                 {
                     if (response.Data.TransmissionId == t_id)
                     {
+                        Console.WriteLine($"Retreived response => T_ID: {response.Data.TransmissionId}");
                         _packetRespList.Remove(response);
-                        return Task.FromResult(response);
+                        return response;
                     }
                 }
-                Thread.Sleep(50);
+                Thread.Sleep(100);
             }
         }
 
         // (UpdateThread)thread => Handle Recurring transmissions (example: request for new messages)
-        private async void UpdateThread() {
+        private void SendThread() {
             while (true) {
-                Thread.Sleep(10000);
+                Thread.Sleep(50);
                 while (packetQueue.Count > 0) { // Send queued packets
                     var packet = packetQueue.Dequeue();
                     var t_id = packet.Data.TransmissionId;
-                    var resp = await packet.TransmitPacket(_appUser);
-                    _packetRespList.Add(resp);
-                    resp = await GetOrWaitResponse(t_id);
-
-
+                    var packetData = packet.PreparePacketForTransmission(_appUser);
+                    var resp = SynchronousClient.SendPacket(packetData);
+                    var respPacket = PacketUtils.AnalyseResposnePacket(resp);
+                    _packetRespList.Add(respPacket);
                 }
                 // What we need to update
                 // New messages - If non, move on
+            }
+        }
+        private async void UpdateThread() {
+            while (true) {
+                Thread.Sleep(5000);
                 Console.WriteLine("Checking for new messages....");
-                var task = _appManager.SendPullMessageRequest();
-                task.Wait();
+                var msgCount = await _appManager.SendPullMessageRequest();
                 // isSending.WaitOne();
             }
         }
-
 
 
     }

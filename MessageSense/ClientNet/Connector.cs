@@ -37,9 +37,9 @@ namespace MessageSense.ClientNet
         // The response from the remote device.  
         private static String response = String.Empty;
 
-        public static async Task<string> StartClient(string data)
+        public static Task<string> StartClient(string data)
         {
-            await Task.Yield();
+            string resp = string.Empty;
             try {  
                 IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
                 Console.WriteLine(ipAddress.ToString());
@@ -61,12 +61,14 @@ namespace MessageSense.ClientNet
  
                 Console.WriteLine("Response received : {0}", response);
 
-                return response;
+                resp = response;
+                response = string.Empty;
+                return Task.FromResult(resp);
             } catch (Exception e) {
                 Console.WriteLine("!<Exceptionn Location Details> Method => AsynchrounusConnector.StartClient | File => Connector.cs | Line => 42");
                 Console.WriteLine(e.ToString());
             }
-            return response;
+            return Task.FromResult(resp);
         }
 
         private static void ConnectCallback(IAsyncResult ar)
@@ -106,22 +108,21 @@ namespace MessageSense.ClientNet
                 StateObject state = (StateObject)ar.AsyncState;
                 Socket client = state.workSocket;
                 int bytesRead = client.EndReceive(ar);
-                var data = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
+               
                 if (bytesRead > 0) {
-                    state.sb.Append(data);
+                    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
                     client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                         new AsyncCallback(ReceiveCallback), state);
                 } else {
 
-                    if (state.sb.Length > 1 || state.sb.ToString().Contains("| <EOF>"))
-                    {
+                    if (state.sb.ToString().Contains("<EOF>")) {
                         response = state.sb.ToString();
                     }
 
-                    receiveDone.Set();  
+                    receiveDone.Set();
                     client.Shutdown(SocketShutdown.Both);
                     client.Close();
-                    client = null;
+
                 }
             }
             catch (Exception e)

@@ -32,7 +32,7 @@ public partial class MessagePage : ContentPage
 		_refreshThread = new Thread(() => BackgroundRefreshThread());
 		_refreshThread.Start();
 		isSending = false;
-		ClearMessages(contact, _context);
+		// ClearMessages(contact, _context);
 	}
 
 	private async void BackgroundRefreshThread()
@@ -111,6 +111,7 @@ public partial class MessagePage : ContentPage
 
 	private void OnGoBack(object sender, EventArgs e)
     {
+		_refreshThread = null;
 		Application.Current.MainPage = new ContactsPage(_appManager);
     }
 

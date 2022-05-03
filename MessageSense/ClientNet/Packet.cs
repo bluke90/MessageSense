@@ -67,17 +67,14 @@ namespace MessageSense.ClientNet
 
     }
 
-    public static class PacketUtils
-    {
-        public static string SearializePacket(this Packet packet)
-        {
+    public static class PacketUtils {
+        public static string SearializePacket(this Packet packet) {
             var data = JsonSerializer.Serialize(packet);
             return data;
         }
 
 
-        public static Packet GeneratePacket()
-        {
+        public static Packet GeneratePacket() {
             var packet = new Packet();
             packet.Data = new PacketData()
             {
@@ -85,6 +82,31 @@ namespace MessageSense.ClientNet
 
             };
             return packet;
+        }
+
+        public static string PreparePacketForTransmission(this Packet packet, AppUser user) {
+            packet.Data.TaskCode = packet.TaskCode.Value;
+            try {
+                packet.Data.AuthToken = user.CurrentAuthToken;
+                packet.Data.AppUserId = user.Id;
+                // Prepare PacketData for transmission
+                var packetData = JsonSerializer.Serialize(packet.Data);
+                return packetData;
+            } catch (Exception ex) {
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine("Exception thrown while Preparing packet for transmission");
+            }
+            return string.Empty;
+        }
+
+        public static Packet AnalyseResposnePacket(string data) {
+
+            var array = data.Split(NetControlChars.PrimarySeperator.Value);
+            var respPacketData = JsonSerializer.Deserialize<PacketData>(array[0]);
+            var respPacket = new Packet() { Data = respPacketData };
+            Console.WriteLine("Received: " + array[0]);
+
+            return respPacket;
         }
 
         public static async Task<Packet> TransmitPacket(this Packet packet, AppUser user, bool authenticate = true)
@@ -141,9 +163,8 @@ namespace MessageSense.ClientNet
             packet.TaskCode = TaskCodes.StoreMessageRequest;
             return;
         }
-        public static async Task GenerateMessageReceivedConfirmation(this Packet packet, List<int> msg_ids)
+        public static void GenerateMessageReceivedConfirmation(this Packet packet, List<int> msg_ids)
         {
-            await Task.Yield();
             if (msg_ids.Count > 1) {
                 packet.Data.Data = $"{string.Join(NetControlChars.DataObjSeperator.Value, msg_ids)}";
             } else {

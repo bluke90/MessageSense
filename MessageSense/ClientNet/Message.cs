@@ -31,7 +31,8 @@ namespace MessageSense.ClientNet
             try {
                 var packet = PacketUtils.GeneratePacket();
                 await packet.GenerateMessageStoreRequest(msg);
-                var respPacket = await app.PacketHandler.SendAsync(packet);
+                app.PacketHandler.QueuePacket(packet);
+                var respPacket = app.PacketHandler.GetOrWaitResponse(packet);
                 if (respPacket.Data.Data != msg.Id.ToString()) throw new Exception("Unkown resposne for StoreMessageRequest");
             } catch (Exception ex) {
                 Console.WriteLine("Exception Location => Message.cs => MessgaeUtils.SendStoreMessageRequest");
@@ -48,7 +49,8 @@ namespace MessageSense.ClientNet
 
             try
             {
-                var respPacket = await appManager.PacketHandler.SendAsync(packet);
+                appManager.PacketHandler.QueuePacket(packet);
+                var respPacket = appManager.PacketHandler.GetOrWaitResponse(packet);
                 var respData = respPacket.Data;
 
                 if (respData.TaskCode == "Cmd.0004") { return 0; }
@@ -73,11 +75,12 @@ namespace MessageSense.ClientNet
                 {
                     var msgObj = JsonSerializer.Deserialize<Message>(msgs);
                     msgIdList.Add(msgObj.Id);
+                    msgList.Add(msgObj);
                 }
 
 
                 // Send Messages Received Confirmation
-                await SendMessageReceivedConfirmation(msgIdList, appManager);
+                SendMessageReceivedConfirmation(msgIdList, appManager);
 
                 var data = new Data.MessageSenseData();
                 await data.Messages.AddRangeAsync(msgList);
@@ -91,15 +94,15 @@ namespace MessageSense.ClientNet
             return 0;
         }
 
-        private static async Task SendMessageReceivedConfirmation(List<int> msg_ids, AppManager appManager)
+        private static void SendMessageReceivedConfirmation(List<int> msg_ids, AppManager appManager)
         {
             Console.WriteLine("Attempting SendMessageReceivedConfirmation");
             try
             {
                 var packet = PacketUtils.GeneratePacket();
-                await packet.GenerateMessageReceivedConfirmation(msg_ids);
-
-                var respPacket = await appManager.PacketHandler.SendAsync(packet);
+                packet.GenerateMessageReceivedConfirmation(msg_ids);
+                appManager.PacketHandler.QueuePacket(packet);
+                var respPacket = appManager.PacketHandler.GetOrWaitResponse(packet);
                 var respData = respPacket.Data;
                 
 
