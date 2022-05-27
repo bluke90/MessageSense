@@ -51,6 +51,8 @@ public partial class MessagePage : ContentPage
 					{
 						_msgQueue.Enqueue(message);
 						_messages.Add(message);
+						message.Read = true;
+						data.SaveChanges();
 					}
 				}
 				Thread.Sleep(1000);
@@ -100,6 +102,7 @@ public partial class MessagePage : ContentPage
 			_context.SaveChanges();
 
 			Task.Run(() => msg.SendStoreMessageRequest(_appManager));
+			msgEntry.Text = string.Empty;
 		}catch (Exception ex)
         {
 			Console.WriteLine("Exception Location Details: Method => OnSendMsg | File => MessagePage.Xaml.cs | Line => 84");

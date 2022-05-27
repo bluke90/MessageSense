@@ -102,4 +102,8 @@ public partial class ContactsPage : ContentPage
 
 		PopulateContacts();
     }
+
+	private void OnGoBack(object sender, EventArgs e) {
+		Application.Current.MainPage = new MainPage(_appManager);
+    }
 }

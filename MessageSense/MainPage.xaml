@@ -5,12 +5,26 @@
              BackgroundColor="#242424">
 
     <ScrollView>
-        <Grid RowSpacing="25" RowDefinitions="Auto,Auto,Auto,Auto,*"
-              Padding="{OnPlatform iOS='30,60,30,30', Default='30'}">
+        <Grid Padding="{OnPlatform iOS='30,60,30,30', Default='30'}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="200"/>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+
+            <Image
+                Source="proton_logo.png"
+                Grid.Row="0"
+                HeightRequest="250"
+                WidthRequest="250"
+                VerticalOptions="Start"
+                Margin="0"/>
 
             <Label 
                 Text="MessageSense!"
-                Grid.Row="0"
+                Grid.Row="1"
                 SemanticProperties.HeadingLevel="Level1"
                 FontSize="32"
                 HorizontalOptions="Center" />
@@ -18,17 +32,26 @@
             <Label 
                 x:Name="newMsgLbl"
                 Text="New Messages:"
-                Grid.Row="1"
+                Grid.Row="2"
                 FontSize="18"
                 FontAttributes="Bold"
                 HorizontalOptions="Center" />
 
-            <Button 
+            <StackLayout Orientation="Vertical" Spacing="10"
+                         Grid.Row="3">
+                <Button 
                 Text="My Contacts"
                 FontAttributes="Bold"
-                Grid.Row="2"
                 Clicked="OnContactsPage"
-                HorizontalOptions="CenterAndExpand"/>
+                HorizontalOptions="CenterAndExpand"
+                WidthRequest="120"/>
+                <Button 
+                Text="Settings"
+                FontAttributes="Bold"
+                Clicked="OnSettingsPage"
+                HorizontalOptions="CenterAndExpand"
+                WidthRequest="120"/>
+            </StackLayout>
 
         </Grid>
     </ScrollView>

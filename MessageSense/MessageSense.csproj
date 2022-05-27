@@ -51,7 +51,7 @@
 
 	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<!-- Required - WinUI does not yet have buildTransitive for everything -->
-		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.1" />
+		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.3.1" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.3" />
 	</ItemGroup>
 
@@ -59,12 +59,15 @@
 	  <None Remove="Resources\Images\account_circle.svg" />
 	  <None Remove="Resources\Images\account_circle_white.svg" />
 	  <None Remove="Resources\Images\arrow_back_white.svg" />
+	  <None Remove="Resources\Images\proton_logo.png" />
+	  <None Remove="Resources\Images\Proton_logo_noscript.png" />
+	  <None Remove="Resources\Images\proton_logo_small.png" />
 	</ItemGroup>
 
+	<!-- **** IF  INSTALL PACKAGE UPDATE SPECIFIC TO WINDOWS -> REMOVE FROM GENERAL REFERANCE -->
 	<ItemGroup>
 	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.4" />
-
 	</ItemGroup>
 
 

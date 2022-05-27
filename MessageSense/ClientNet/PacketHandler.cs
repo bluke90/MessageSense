@@ -8,6 +8,8 @@ namespace MessageSense.ClientNet
 {
     public class PacketHandler
     {
+        public bool Connected = false;
+
         private Queue<Packet> packetQueue = new Queue<Packet>();
         private List<Packet> _packetRespList { get; set; }
         private Data.MessageSenseData MessageSenseData { get; set; }
@@ -26,6 +28,7 @@ namespace MessageSense.ClientNet
             _appUser = manager.AppUser;
             packetQueue = new Queue<Packet>();
             _packetRespList = new List<Packet>();
+            Connected = SendConnectionTest();
             _sendThread = new Thread(SendThread);
             _sendThread.Start();
             _updateThread = new Thread(UpdateThread);
@@ -53,19 +56,35 @@ namespace MessageSense.ClientNet
             _packetRespList.Add(respPacket);
         }
 
-        public Task<Packet> SendAsync() {
-            throw new NotImplementedException();
+        public bool SendConnectionTest() {
+            var packet = PacketUtils.GeneratePacket();
+            packet.TaskCode = TaskCodes.ConnectionTest;
+            packet.Data.TransmissionId = 0;
+            var packetData = packet.PreparePacketForTransmission(_appUser, auth: false);
+            try {
+                var resp = SynchronousClient.SendPacket(packetData);
+                var respPacket = PacketUtils.AnalyseResposnePacket(resp);
+                if (respPacket.Data.TransmissionId != 0) throw new Exception("Unkown Error when processing connection test response | PacketHandler.cs => PacketHandler.SendConnectionTest()");
+                var result = bool.Parse(respPacket.Data.Data);
+                return result;
+            } catch (Exception ex) {
+                Console.WriteLine("Unable to verify connection integrity...");
+                return false;
+            }
         }
 
-        public async Task<Packet> SendUnauthenticatedAsync(Packet packet, AppUser appUser)
+        public Packet SendUnauthenticatedAsync(Packet packet, AppUser appUser)
         {
             // isSending.Reset();
             var tId = packet.Data.TransmissionId;
 
-            var resp = await packet.TransmitPacket(appUser, authenticate: false);
+            packet.PreparePacketForTransmission(appUser);
+            var packetData = packet.PreparePacketForTransmission(appUser, auth: false);
+            var resp = SynchronousClient.SendPacket(packetData);
+            var respPacket = PacketUtils.AnalyseResposnePacket(resp);
+            if (respPacket.Data.TransmissionId != tId) throw new Exception("Unkown Error when processing connection test response | PacketHandler.cs => PacketHandler.SendConnectionTest()");
 
-            // isSending.Set();
-            return resp;
+            return respPacket;
         }
 
         public Packet GetOrWaitResponse(Packet packet)

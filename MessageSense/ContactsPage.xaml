@@ -9,6 +9,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -25,16 +26,28 @@
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
-            
-            <Label Text="Select a Contact:"
-                Grid.Row="0"
-                Grid.Column="1"
-                FontSize="Medium"
-                FontAttributes="Bold"
-                WidthRequest="150"
-                VerticalOptions="Center"
-                Margin="-6"/>
 
+            <StackLayout Orientation="Vertical"
+                Grid.Row="0"
+                Grid.Column="1">
+                <Image
+                    Source="proton_logo_noscript.png"
+                    WidthRequest="110"
+                    HeightRequest="80"
+                    VerticalOptions="Start"
+                    HorizontalOptions="Center"
+                    Margin="25, -5, 0, 0"
+                    />
+
+                <Label Text="Select a Contact:"
+                    FontSize="Medium"
+                    FontAttributes="Bold"
+                    WidthRequest="150"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Start"
+                    Margin="5, -18, 0, 0"/>
+            </StackLayout>
+            
             <Button
                 Text="Add Contact"
                 TextColor="White"
@@ -47,9 +60,9 @@
                 Clicked="AddContact"
                 Grid.Row="0"
                 Grid.Column="0"
-                WidthRequest="100"
+                WidthRequest="98"
                 HeightRequest="40"
-                Margin="5"
+                Margin="-15, 0, 0, 0"
                 VerticalOptions="CenterAndExpand"/>
 
             <Frame
@@ -59,10 +72,10 @@
                 HorizontalOptions="End"
                 BackgroundColor="#181818"
                 BorderColor="DarkGoldenrod"
-                WidthRequest="105"
-                HeightRequest="55"
+                WidthRequest="98"
+                HeightRequest="40"
                 Margin="5"
-                Padding="4">
+                Padding="4, 3, 5, 5">
 
                 <StackLayout>
                   <Label x:Name="contactToken"
@@ -89,13 +102,26 @@
             Margin="4"
             Padding="2">
 
+            <ScrollView>
             <VerticalStackLayout
                 VerticalOptions="FillAndExpand"
                 HorizontalOptions="FillAndExpand"
                 x:Name="contactStack"
                 Spacing="2"/>
+            </ScrollView>
         </Frame>
 
+        <Button
+            Grid.Row="2"
+            Text="Go Back"
+            FontAttributes="Bold"
+            BorderColor="DarkGoldenrod"
+            BorderWidth="1"
+            BackgroundColor="{DynamicResource PrimaryColor}"
+            Clicked="OnGoBack"
+            Margin="5,1,5,3"/>
+
     </Grid>
+
 
 </ContentPage>

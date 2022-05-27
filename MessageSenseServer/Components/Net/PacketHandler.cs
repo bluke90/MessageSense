@@ -65,6 +65,9 @@ namespace MessageSenseServer.Components.Net
                 case "Cmd":     // Response/Command
                     await packet.HandleCmdPacket(code);
                     break;
+                case "Con":
+                    packet.Data.Data = "True";
+                    break;
             }
             var resp = JsonSerializer.Serialize(packet.Data);
             return resp;

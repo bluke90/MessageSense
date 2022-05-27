@@ -41,7 +41,7 @@ namespace MessageSense.ClientNet
         {
             string resp = string.Empty;
             try {  
-                IPAddress ipAddress = IPAddress.Parse("192.168.1.15");
+                IPAddress ipAddress = IPAddress.Parse("192.168.1.5");
                 Console.WriteLine(ipAddress.ToString());
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
  

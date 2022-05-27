@@ -95,7 +95,6 @@ namespace MessageSenseServer.Components.Net
             return;
         }
 
-
         public static async Task ProcessContactTokenRequest(this Packet packet)
         {
             var userData = packet.Data.Data.Split(" -- ")[0];

@@ -47,8 +47,8 @@ namespace MessageSense.ClientNet
         {
             var packet = PacketUtils.GeneratePacket();
             AppUser user; Packet resp;
-
-
+            packet.TaskCode = TaskCodes.ContactTokenRequest;
+            packet.Data.TransmissionId = 1;
             while (true)
             {
                 user = GenerateAppUser(username, firstname);
@@ -56,7 +56,9 @@ namespace MessageSense.ClientNet
                 packet.GenerateContactTokenRequest(user);
                 try
                 {
-                    resp = await appManager.PacketHandler.SendUnauthenticatedAsync(packet, user);
+                    var packetData = packet.PreparePacketForTransmission(user, auth: false);
+                    var respData = SynchronousClient.SendPacket(packetData);
+                    resp = PacketUtils.AnalyseResposnePacket(respData);
 
                     var resp_split = resp.Data.Data.Split(" -- ");
                     if (resp.Data.TaskCode == "Cmd.0002" && resp_split[0] == user.ContactToken && resp_split[1] == user.Username) break;

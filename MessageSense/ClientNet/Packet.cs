@@ -44,6 +44,7 @@ namespace MessageSense.ClientNet
         public static TaskCodes NewAuthTokenReceived { get { return new TaskCodes("Cmd.0001"); } }
         public static TaskCodes ContactTokenReceived { get { return new TaskCodes("Cmd.0002"); } }
         public static TaskCodes MessagesPullReceived { get { return new TaskCodes("Cmd.0003"); } }
+        public static TaskCodes ConnectionTest { get { return new TaskCodes("Con.0"); } }
 
         public static TaskCodes Parse(string taskCode) {
             switch (taskCode) {
@@ -84,11 +85,13 @@ namespace MessageSense.ClientNet
             return packet;
         }
 
-        public static string PreparePacketForTransmission(this Packet packet, AppUser user) {
+        public static string PreparePacketForTransmission(this Packet packet, AppUser user, bool auth = true) {
             packet.Data.TaskCode = packet.TaskCode.Value;
             try {
-                packet.Data.AuthToken = user.CurrentAuthToken;
-                packet.Data.AppUserId = user.Id;
+                if (auth == true) {
+                    packet.Data.AuthToken = user.CurrentAuthToken;
+                    packet.Data.AppUserId = user.Id;
+                }
                 // Prepare PacketData for transmission
                 var packetData = JsonSerializer.Serialize(packet.Data);
                 return packetData;

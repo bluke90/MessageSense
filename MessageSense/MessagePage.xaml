@@ -4,7 +4,8 @@
              x:Class="MessageSense.MessagePage"
              Title="MessagePage"
              BackgroundColor="#242424">
-    <Grid>
+    
+    <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
@@ -48,32 +49,39 @@
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Grid.Row="1"
+            VerticalOptions="FillAndExpand"
+            HorizontalOptions="FillAndExpand"
             BorderColor="Black"
             BackgroundColor="#181818">
 
+            <ScrollView>
             <StackLayout x:Name="msgStack"
                          Spacing="5"/>
-
+            </ScrollView>
+            
         </Frame>
-
-        <Frame
+        <ScrollView            
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Grid.Row="2"
+            Grid.Row="2">
+            <Frame
             BackgroundColor="#323232"
             Padding="4">
 
-            <StackLayout
-                HorizontalOptions="FillAndExpand"
-                VerticalOptions="FillAndExpand"
-                Spacing="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="90"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="90"/>
+                    </Grid.ColumnDefinitions>
 
                 <Editor x:Name="msgEntry"
                     Placeholder="Message..."
+                    Grid.Row="0"
+                    Grid.Column="0"
                     VerticalOptions="FillAndExpand"
-                    HorizontalOptions="StartAndExpand"
-                    WidthRequest="275"
-                    HeightRequest="250"
                     TextColor="White"
                     PlaceholderColor="#383838"
                     BackgroundColor="#151515"
@@ -87,16 +95,18 @@
                     TextColor="White"
                     BorderColor="DarkGoldenrod"
                     BorderWidth="2"
-                    VerticalOptions="Center"
-                    HorizontalOptions="EndAndExpand"
-                    WidthRequest="65"
-                    HeightRequest="45"
+                    WidthRequest="75"
+                    HeightRequest="50"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalOptions="StartAndExpand"
                     FontAttributes="Bold"
-                    Margin="-5"/>
-            </StackLayout>
+                    Margin="5"/>
+                </Grid>
 
-        </Frame>
-
+            </Frame>
+        </ScrollView>
 
     </Grid>
+   
 </ContentPage>
